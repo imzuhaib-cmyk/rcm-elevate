@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCM Elevate — Take-Home Workshops &amp; Project Portal</title>
+<style>
+  :root{
+    --navy:#12306E; --navy-deep:#0E2657; --blue-1:#163A86; --blue-2:#1D57AE; --blue-3:#2A7AD0;
+    --teal:#1A6B72; --blue:#2A7AD0; --lightblue:#EAF1FB;
+    --lightgray:#F2F4F8; --gray:#5B6472; --gold:#F5A623; --gold-bright:#FFC424; --goldbg:#FBF3DC;
+    --green:#1e8a4c; --amber:#c98a12; --red:#c0392b; --border:#dfe3ea;
+    --glass-fill:rgba(255,255,255,.09); --glass-border:rgba(255,255,255,.30);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI', Roboto, Arial, sans-serif; color:#22262e;
+    background:#eef2f9;
+  }
+  header{
+    position:relative; overflow:hidden; color:#fff; padding:26px 28px 22px;
+    background:linear-gradient(135deg, var(--blue-1) 0%, var(--navy-deep) 35%, var(--blue-2) 70%, var(--blue-3) 100%);
+  }
+  header::before{
+    content:""; position:absolute; top:-60px; left:-40px; width:320px; height:320px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.10), transparent 70%); pointer-events:none;
+  }
+  header::after{
+    content:""; position:absolute; bottom:-120px; right:8%; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,196,36,.10), transparent 70%); pointer-events:none;
+  }
+  header .headtop{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  header .eyebrow{
+    position:relative; z-index:1; display:inline-block; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:#dfe8ff; margin-bottom:14px; padding:7px 18px; border-radius:20px;
+    background:var(--glass-fill); border:1px solid var(--glass-border);
+  }
+  header h1{ position:relative; z-index:1; margin:2px 0 0; font-size:28px; font-weight:800; letter-spacing:-.01em;}
+  header h1 .rcm-mark{ color:var(--gold-bright); font-weight:900; margin-right:2px;}
+  header .sub{ position:relative; z-index:1; font-size:13px; color:#cfe0ff; margin-top:8px; max-width:760px; line-height:1.5;}
+  header .plane{ position:relative; z-index:1; flex:0 0 auto; opacity:.9;}
+  nav{
+    display:flex; flex-wrap:wrap; gap:8px; background:var(--navy-deep); padding:12px 20px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  nav button{
+    background:var(--glass-fill); border:1px solid transparent; color:#dfe8ff; padding:9px 16px; font-size:13px;
+    cursor:pointer; border-radius:20px; font-weight:700; transition:background .15s, color .15s;
+  }
+  nav button:hover{ background:rgba(255,255,255,.18); }
+  nav button.active{ color:var(--navy-deep); background:linear-gradient(135deg, var(--gold-bright), var(--gold)); }
+  main{ padding:22px 28px 60px; max-width:1280px; margin:0 auto; }
+  .card{ background:#fff; border:1px solid var(--border); border-radius:10px; padding:20px 22px; margin-bottom:18px;}
+  h2{ color:var(--navy); font-size:18px; margin:0 0 6px; padding-bottom:10px; border-bottom:3px solid var(--gold); display:inline-block;}
+  h3{ color:var(--blue-2); font-size:15px; margin:18px 0 8px;}
+  p.hint{ color:var(--gray); font-size:13px; margin:2px 0 14px; line-height:1.5;}
+  .row{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:14px;}
+  .field{ display:flex; flex-direction:column; gap:5px; min-width:190px;}
+  .field label{ font-size:12px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.03em;}
+  select, input[type=number], input[type=text]{
+    padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:14px; background:#fff;
+  }
+  button.primary{
+    background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:var(--navy-deep); border:none; padding:9px 18px; border-radius:20px;
+    font-size:14px; font-weight:800; cursor:pointer;
+  }
+  button.primary:hover{ filter:brightness(1.06); }
+  button.ghost{
+    background:#fff; color:var(--blue-2); border:1px solid var(--blue-2); padding:8px 16px; border-radius:20px;
+    font-size:13px; font-weight:700; cursor:pointer;
+  }
+  button.ghost:hover{ background:var(--lightblue); }
+  table{ border-collapse:collapse; width:100%; font-size:13px;}
+  th{ background:var(--blue-2); color:#fff; padding:8px 10px; text-align:left; position:sticky; top:0;}
+  td{ padding:7px 10px; border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{ background:var(--lightgray);}
+  .criterion-row{ display:grid; grid-template-columns: 1fr 120px; gap:14px; align-items:center; padding:8px 0; border-bottom:1px dashed var(--border);}
+  .criterion-row:last-child{ border-bottom:none;}
+  .score-pill{
+    display:inline-block; padding:4px 12px; border-radius:20px; font-weight:700; font-size:14px;
+  }
+  .score-pill.ok{ background:#e4f5ea; color:var(--green);}
+  .score-pill.pending{ background:#f2f4f8; color:var(--gray);}
+  .callout{ background:var(--goldbg); border:1px solid var(--gold); border-radius:8px; padding:12px 16px; font-size:13px; color:#6b5300; margin-bottom:16px;}
+  .callout b{ color:var(--gold); display:block; margin-bottom:4px; font-size:12.5px; text-transform:uppercase; letter-spacing:.03em;}
+  .save-msg{ font-size:13px; color:var(--green); font-weight:700; margin-left:10px; display:none;}
+  .badge{ padding:3px 9px; border-radius:12px; font-size:12px; font-weight:700;}
+  .badge.Outstanding{ background:#e4f5ea; color:var(--green);}
+  .badge.MeetsExpectations{ background:var(--lightblue); color:var(--blue-2);}
+  .badge.NeedsImprovement{ background:#fdf1e0; color:var(--amber);}
+  .badge.Unsatisfactory{ background:#fbe6e3; color:var(--red);}
+  .badge.Active{ background:#e4f5ea; color:var(--green);}
+  .badge.Below{ background:#fbe6e3; color:var(--red);}
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px;}
+  .kpi{ background:linear-gradient(160deg,#eef4ff,#e2ecfd); border-left:4px solid var(--blue-2); border-radius:8px; padding:12px 14px;}
+  .kpi .num{ font-size:24px; font-weight:800; color:var(--navy);}
+  .kpi .lbl{ font-size:12px; color:var(--gray); margin-top:2px;}
+  .heatcell{ width:34px; height:28px; text-align:center; font-size:11px; border-radius:3px; color:#fff; font-weight:600;}
+  .heatcell.nodata{ background:#eceff3; color:#aab; }
+  .nameCell{ position:sticky; left:0; background:#fff; font-weight:600; white-space:nowrap;}
+  .scrollx{ overflow-x:auto; }
+  .tabpanel{ display:none; }
+  .tabpanel.active{ display:block; }
+  .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap:18px;}
+  @media (max-width:900px){ .two-col{ grid-template-columns:1fr; } }
+  .legend-dot{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px;}
+  footer.note{ font-size:12px; color:var(--gray); text-align:center; padding:20px;}
+
+  .mcq-block{ border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:14px; }
+  .mcq-q{ font-weight:700; color:var(--navy); margin-bottom:8px; }
+  .mcq-opt{ display:flex; align-items:center; gap:8px; padding:6px 4px; border-radius:6px; cursor:pointer; }
+  .mcq-opt:hover{ background:var(--lightgray); }
+  .mcq-opt input{ cursor:pointer; }
+  .mcq-opt.correct{ background:#e4f5ea; }
+  .mcq-opt.incorrect{ background:#fbe6e3; }
+  .mcq-explain{ font-size:12.5px; color:var(--gray); margin-top:6px; padding-top:6px; border-top:1px dashed var(--border); display:none; }
+  .task-block{ margin-bottom:14px; }
+  .task-block label{ font-weight:600; color:var(--navy); font-size:13.5px; display:block; margin-bottom:5px; }
+  textarea{ width:100%; min-height:80px; padding:10px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:14px; resize:vertical; }
+  .status-chip{ display:inline-block; padding:3px 11px; border-radius:12px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em;}
+  .status-chip.open{ background:#e4f5ea; color:var(--green);}
+  .status-chip.future{ background:#f2f4f8; color:var(--gray);}
+  .status-chip.done{ background:var(--goldbg); color:var(--gold);}
+  .status-chip.current{ background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:var(--navy-deep);}
+  .progress-strip{ display:flex; gap:6px; margin:10px 0 18px; flex-wrap:wrap; }
+  .progress-dot{ width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; border:2px solid var(--border); color:var(--gray); }
+  .progress-dot.done{ background:var(--green); border-color:var(--green); color:#fff; }
+  .progress-dot.current{ border-color:var(--gold); color:var(--gold); }
+  .score-banner{ background:linear-gradient(135deg,#eef4ff,#e2ecfd); border-left:4px solid var(--blue-2); border-radius:8px; padding:14px 18px; margin-bottom:16px; }
+  .score-banner .big{ font-size:26px; font-weight:800; color:var(--navy); }
+  .review-item{ border-bottom:1px solid var(--border); padding:10px 0; }
+  .review-item:last-child{ border-bottom:none; }
+  header .logo-row{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  header .logo-row img{ height:auto; }
+  header .planes-img{ position:relative; z-index:1; flex:0 0 auto; opacity:.92; }
+  @media (max-width:700px){ header .planes-img{ display:none; } }
+  nav button.locked{ opacity:0.55; }
+  .lock-banner{ background:linear-gradient(135deg,#1a1a3e,#0E2657); border:1px solid rgba(255,196,36,.3); border-radius:10px; padding:30px 28px; text-align:center; color:#fff; }
+  .lock-banner .lock-icon{ font-size:48px; margin-bottom:12px; }
+  .lock-banner h3{ color:#FFC424; margin:0 0 8px; font-size:20px; }
+  .lock-banner p{ color:#B0C4FF; font-size:14px; margin:4px 0; }
+
+  /* Anti-cheat styles */
+
+  .assessment-locked{ pointer-events:none; filter:blur(4px); opacity:0.3; user-select:none; position:relative; }
+  .start-overlay{ text-align:center; padding:30px 20px; margin:16px 0; background:linear-gradient(135deg,#0E2657,#163A86); border-radius:12px; border:2px solid #3B82F6; }
+  .start-overlay h3{ color:#fff; font-size:20px; margin-bottom:8px; }
+  .start-overlay p{ color:#B0C4FF; font-size:14px; margin-bottom:16px; }
+  .start-btn{ padding:14px 50px; background:linear-gradient(135deg,#FFC424,#F5A623); color:#0E2657; font-size:18px; font-weight:800; border:none; border-radius:30px; cursor:pointer; box-shadow:0 4px 15px rgba(245,166,35,.4); transition:all .15s; }
+  .start-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 20px rgba(245,166,35,.5); }
+
+
+  .ac-instructions{ background:linear-gradient(135deg,#1a1a3e,#0E2657); border:2px solid #FFC424; border-radius:10px; padding:18px 22px; margin-bottom:16px; color:#fff; }
+  .ac-instructions h3{ color:#FFC424; margin:0 0 10px; font-size:17px; }
+  .ac-instructions ul{ margin:0; padding-left:18px; }
+  .ac-instructions li{ margin-bottom:8px; font-size:13px; color:#B0C4FF; line-height:1.5; }
+  .ac-instructions li b{ color:#fff; }
+  .ac-instructions .start-note{ margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,196,36,.3); font-size:12px; color:#FFC424; font-weight:700; }
+
+  .timer-bar{ position:sticky; top:0; z-index:100; background:linear-gradient(135deg,#0E2657,#163A86); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 8px 8px; margin:-20px -20px 16px; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+  .timer-bar .time{ font-size:22px; font-weight:800; color:#FFC424; font-family:monospace; }
+  .timer-bar .time.warning{ color:#DC2626; animation:pulse 1s infinite; }
+  .timer-bar .info{ font-size:12px; color:#B0C4FF; }
+  .timer-bar .violations{ font-size:11px; color:#FF6B6B; font-weight:700; }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.5} }
+  .tab-warning-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(14,38,87,.95); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#fff; }
+  .tab-warning-overlay h2{ color:#FFC424; font-size:28px; margin-bottom:10px; }
+  .tab-warning-overlay p{ font-size:16px; color:#B0C4FF; max-width:500px; text-align:center; }
+  textarea.ac-protected, .mcq-block.ac-protected input{ -webkit-user-select:text; user-select:text; }
+  .mcq-block{ user-select:none; -webkit-user-select:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-row">
+    <img src="data:image/png;base64,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" alt="Learning & Development" height="36">
+    <img src="data:image/png;base64,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" alt="CureMD" height="30">
+  </div>
+  <div class="headtop">
+    <div>
+      <div class="eyebrow">Take-Home Learning &amp; Project Portal</div>
+      <h1><span class="rcm-mark">RCM</span> Elevate — Workshops &amp; Project</h1>
+      <div class="sub">8 weekly workshops (Aug–Sep 2026) · 20 MCQ/scenario questions + open-ended tasks each, then a bimonthly project case study from Month 3 (Oct 2026) through Month 24</div>
+    </div>
+    <img class="planes-img" src="data:image/png;base64,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" alt="Elevate" height="80">
+  </div>
+</header>
+<nav id="navbar"></nav>
+<main id="main"></main>
+<footer class="note">Your answers save automatically as you work. Pick your name each time you visit. <button onclick="exportMyData()" style="background:linear-gradient(135deg,#FFC424,#F5A623);color:#0E2657;border:none;padding:8px 18px;border-radius:20px;font-weight:800;cursor:pointer;margin-left:10px;">📤 Export &amp; Share to WhatsApp</button></footer>
+<script>
+/* STORAGE SHIM — works in Claude AND any browser (localStorage fallback) */
+(function(){
+  var useClaudeStorage = false;
+  try { useClaudeStorage = (typeof window.storage === 'object' && window.storage !== null && typeof window.storage.get === 'function'); } catch(e){}
+  if(useClaudeStorage){
+    window._store = {
+      get: async function(k){ try{ var r=await window.storage.get(k,false); return (r&&r.value)?r.value:null; }catch(e){ return null; } },
+      set: async function(k,v){ try{ await window.storage.set(k,v,false); return true; }catch(e){ return false; } }
+    };
+  } else {
+    window._store = {
+      get: async function(k){ return localStorage.getItem(k)||null; },
+      set: async function(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+    };
+  }
+})();
+const WORKSHOPS = [
+  {
+    id:"W1", week:1, title:"Adaptive Learning & RCM System Mastery", competency:"Learning Agility",
+    scenario:"Two weeks ago a major commercial payer published a mid-quarter policy update: new prior-authorisation requirements for several specialty CPT codes, a shorter timely-filing window, and a change to how secondary claims must be submitted. In the same week your RCM platform shipped an automation update that changes how charges are batched. Your unit's Prior Auth, Rejections and Charges KPIs are all exposed. Leadership expects full compliance within 10 working days.",
+    data:["Prior Auth target 7/day; Authorisation Denials ≤ 0.5%.","Rejections target 20/day, quality threshold ≤ 0.5%.","Charges + Automation throughput target 20/day.","Assume you have the payer bulletin and platform release notes in hand.","The team has mixed tenure — three members joined in the last quarter."],
+    tasks:["Summarise the payer and platform changes in plain language a new hire could follow (one page maximum).","Map each change to the KPI(s) it affects and flag the single highest-risk change.","Build a one-page desk cheat sheet the team can keep at their workstation.","Propose a 10-working-day ramp plan that reaches full compliance without dropping below target, including how you will verify the team has learned it.","Identify the two questions you would escalate to the payer or vendor, and explain why."],
+    deliverable:"A change brief (≤1 page), a desk cheat sheet (≤1 page) and the 10-day ramp plan."
+  },
+  {
+    id:"W2", week:2, title:"Cross-Functional Collaboration in RCM", competency:"Collaboration",
+    scenario:"A specialty practice's 90+ AR has climbed from 8% to 13% over two months. A recurring denial is bouncing between Eligibility/BV, Charges and Enrollment. Each team's individual KPIs look fine, yet the account is stuck. You do not manage these teams — you have to influence, not direct.",
+    data:["AR/90+ ageing target ≤ 10%; currently at 13%.","BV target 10/day; Enrollments target 4/day; Charges target 20/day.","Three teams touch the account; no single person owns the end-to-end flow today."],
+    tasks:["Draw the current handoff map for this account type — who does what, in what order, with which inputs and outputs.","Pinpoint the broken handoff and explain why each team currently believes it is not their fault.","Propose a simple RACI for this workflow plus one shared metric all three teams would own together.","Draft a 20-minute joint huddle agenda, written so no team feels blamed.","Recommend one lightweight control that would catch this earlier next time."],
+    deliverable:"A handoff map, a RACI, a shared-metric definition and a huddle agenda."
+  },
+  {
+    id:"W3", week:3, title:"Root-Cause Analysis for Denials & AR", competency:"Problem Solving",
+    scenario:"Over the last six weeks, clinical denials for one specialty group rose from 0.3% to 1.4% — nearly five times the 0.5% threshold. A denial export lists reasons, CPT codes, providers and payers. Leadership wants root causes, not a list of symptoms, plus a realistic recovery estimate.",
+    data:["Clinical Denials target 10/day; quality threshold ≤ 0.5%; currently running 1.4%.","The export covers ~600 denied lines across 4 providers and 3 payers.","Illustrative split: ~40% medical necessity, ~25% missing documentation, ~20% coding mismatch, ~15% other.","Some denials are recoverable on appeal; some are not."],
+    tasks:["Pareto the denial reasons and identify the vital few that explain most of the volume.","Run a 5-Whys on the single largest reason and build a fishbone (people, process, system, payer) for the top two reasons.","Separate the symptom from the root cause for each, stating your evidence.","Propose a corrective action (clear the backlog) and a preventive action (stop recurrence) for the top two root causes.","Estimate the recoverable dollars and the realistic timeline to bring denials back under 0.5%."],
+    deliverable:"An RCA report: Pareto analysis, 5-Whys, fishbone diagram(s), a CAPA table, and a recovery estimate."
+  },
+  {
+    id:"W4", week:4, title:"Owning the Numbers: KPI Accountability", competency:"Ownership & Accountability",
+    scenario:"For the past three weeks your pod has missed its DM productivity target (15/day, running ~11) and breached CCH quality (2% threshold, running ~3.2%). There were real pressures — two absences and a half-day system outage — but leadership has asked you for an ownership plan, not a list of reasons.",
+    data:["DM target 15/day; actual ~11. CCH target 20/day at 2% quality threshold; actual ~3.2%.","Two team absences and one half-day system outage during the period.","You control task allocation, daily prioritisation and quality checks. You do not control headcount or the platform."],
+    tasks:["Self-audit the three weeks against target and threshold; state the gap in numbers.","Separate what was within your control from what was not — own the controllable part explicitly.","Write a 30-day recovery plan with daily check-ins and a weekly target ramp back to standard.","Define what you will own personally and what you will escalate, with the escalation worded professionally.","State the one metric you will report to leadership each week and your commitment for it."],
+    deliverable:"An ownership plan with gap analysis, a 30-day ramp and a written weekly commitment."
+  },
+  {
+    id:"W5", week:5, title:"Emotional Intelligence & Handling Pressure", competency:"Emotional Maturity",
+    scenario:"It is month-end. The EOB queue is at double its normal volume (target 200/day) and the team is behind. A normally reliable colleague snaps at you in front of others over a reassigned account. Later the same day your manager gives you blunt critical feedback about a missed batch — also in front of the team.",
+    data:["EOB target 200/day; volume roughly doubled at month-end.","The colleague is usually dependable and is clearly overloaded.","The manager's feedback is fair in substance but poorly timed."],
+    tasks:["Write a short reflective note identifying your own triggers in this scenario and the early signs you are starting to escalate.","Draft a calm de-escalation response to the colleague that preserves the relationship.","Plan how and when you will follow up with your manager — accepting the substance while addressing the timing constructively.","Design a personal composure routine for high-volume periods (before, during and after).","Note one thing you would do differently as a future leader to protect your team's composure at month-end."],
+    deliverable:"A written reflection, two response scripts, and a personal composure routine."
+  },
+  {
+    id:"W6", week:6, title:"Career Pathing & Goal Setting for Future Leaders", competency:"Drive & Ambition",
+    scenario:"Elevate runs over 24 months. An initial salary increment becomes available after three consecutive months above the performance threshold, with further performance-based growth across months 4–24. You are asked to own your development — to build a concrete 24-month plan rather than waiting to be developed.",
+    data:["The program scores 70% Operational, 10% Behavioural and 20% Leadership.","Reward track: a Month-3 initial increment, then growth across months 4–24.","Stretch assignments and the full workshop curriculum (W1–W8) are available to you."],
+    tasks:["Self-assess honestly against the six behavioural competencies and four leadership components; name your two strongest and two weakest.","Write 3–4 SMART goals spanning the 24 months, each tied to a measurable program metric.","Map each goal to specific actions, workshops and at least one stretch assignment.","Define your own success metrics and quarterly checkpoints.","Identify the support you will ask for and what you will bring in return."],
+    deliverable:"A personal 24-month development plan with SMART goals, a timeline map and a written support contract."
+  },
+  {
+    id:"W7", week:7, title:"Leading People & Delegation", competency:"Leadership",
+    scenario:"You have just been given a 5-person pod responsible for AR/90+ (≤ 10%) and Rejections (20/day at ≤ 0.5%). One member is a high performer who is bored; one is new and struggling with rejection work-types; the workload is uneven and two members are quietly overloaded. You can no longer do all the work yourself.",
+    data:["The pod owns AR/90+ ≤ 10% and Rejections 20/day at ≤ 0.5%.","Skill and motivation vary widely across the five members.","You are transitioning from doing to leading; the temptation to take work back is strong."],
+    tasks:["Build a skill/will matrix for the five members.","Design a workload rebalancing plan that fits work to capacity and stretches the high performer.","Write a coaching plan for the struggling new member with a 30-day ramp.","Draft a delegation conversation script for handing a meaningful task to the high performer.","Define how you will monitor pod KPIs without micromanaging: what you watch, how often, and when you step in."],
+    deliverable:"A pod leadership plan: skill/will matrix, rebalancing plan, coaching plan, delegation script and monitoring approach."
+  },
+  {
+    id:"W8", week:8, title:"Leadership Simulation & Capstone", competency:"All competencies",
+    scenario:"You are appointed acting team lead of an RCM unit for a simulated quarter. Over two days you face a sequence of events: a mid-quarter payer policy change, a cross-team denial bottleneck pushing 90+ AR over threshold, a sudden resignation that destabilises workload, a tense month-end, and a quality audit. You must keep the unit above the 52.5% standing threshold and present a turnaround to a mock leadership panel.",
+    data:["The unit spans DM, AR/90+, Charges, Rejections, Denials, EOB and Enrollments.","Events are released in sequence; you respond in role.","This capstone is graded and feeds the 20% Leadership Evaluation (Capstone component)."],
+    tasks:["Produce an integrated quarter turnaround plan covering operational recovery across the affected KPIs.","Show your people-leadership decisions: workload after the resignation, coaching, and composure under month-end pressure.","Demonstrate cross-functional coordination to clear the denial and AR bottleneck.","Build a panel presentation (8–10 slides): problem, actions, expected impact, risks. Present and defend it live.","Reflect on which competencies you leaned on most and your two biggest development areas."],
+    deliverable:"A capstone report + a panel presentation (8–10 slides), presented and defended. Assessed against the full leadership rubric."
+  },
+];
+
+const PROJECT_CYCLES = [
+  {
+    id:"BM-01", month:3, focus:"Learning Agility", scope:"Individual", title:"The Portal Migration",
+    quote:"\"The clock on a payer change doesn't stop for onboarding. It starts the day the bulletin lands.\"",
+    scenario:"Your clearinghouse is migrating to a new claims portal in three weeks — new login flow, new rejection-code taxonomy, no more legacy batch upload. In the same week, a payer you've worked with for two years launches a new commercial line covering four additional CPT codes, each with its own prior-authorisation rule. Your Eligibility and Prior Auth KPIs are both exposed, and two of your five team members joined in the last eight weeks.",
+    data:["Eligibility target: 12/day, quality threshold ≤ 0.5% error.","Prior Auth target: 7/day, denial threshold ≤ 0.5%.","Portal cutover date: 3 weeks from today. No parallel-run period offered by the clearinghouse.","Two of five team members have under 8 weeks' tenure."],
+    tasks:["Summarise both changes in plain language a new hire could follow (one page maximum).","Map each change to the KPI(s) it affects and flag the single highest-risk change given your team's tenure mix.","Build a one-page cheat sheet for the new portal login/rejection workflow.","Propose a 15-working-day adoption plan that reaches full compliance without dropping below target, including how you will verify the two newer team members have actually learned it.","Identify the two questions you would escalate to the clearinghouse or payer, and explain why those two."],
+    deliverable:"A change brief (≤1 page), a desk cheat sheet (≤1 page), and the 15-day adoption plan."
+  },
+  {
+    id:"BM-02", month:5, focus:"Collaboration", scope:"Individual", title:"The Enrollment Bottleneck",
+    quote:"\"Every team's dashboard is green. The account is still stuck. That gap is where leadership lives.\"",
+    scenario:"A fast-growing multi-provider practice has a charge-posting backlog that keeps growing. Credentialing says enrollment paperwork is with the payer. Enrollment says Credentialing hasn't sent the final roster. Charges says they can't post until enrollment IDs land. Individually, every team is hitting its own KPI. You don't manage any of these three teams — you have to influence, not direct.",
+    data:["Charges backlog: 340 claims and growing at ~25/day.","Credentialing target: 6 providers/week processed; Enrollment target: 4/day; Charges target: 20/day — all three currently green on their own metric.","No single person owns the end-to-end enrollment-to-charge flow for this practice today."],
+    tasks:["Draw the current handoff map for this practice — who does what, in what order, with which inputs and outputs.","Pinpoint the specific handoff that is actually broken, and explain why each team currently believes it isn't theirs.","Draft a RACI for the end-to-end flow and propose one shared metric all three teams would track together.","Write the opening message you would send to kick off a joint huddle — no accusatory language, one clear ask.","As a leader: how will you brief your own manager on this cross-team risk before it becomes a month-end problem?"],
+    deliverable:"A handoff map, the RACI + shared metric proposal, and the huddle opening message (≤300 words)."
+  },
+  {
+    id:"BM-03", month:7, focus:"Problem Solving", scope:"Individual", title:"The Recurring Denial Code",
+    quote:"\"A denial that comes back a third time isn't a denial problem. It's a process problem wearing a denial's clothes.\"",
+    scenario:"CO-16 (claim lacks information) has resurfaced across three different accounts in the last quarter, despite two prior 'fixes.' The denial rate for this code sits above the quality threshold across your book. Leadership wants a plan that actually holds this time, not a third patch.",
+    data:["Denial quality threshold: ≤ 0.5% for this code; current rate: 1.8% across the three affected accounts.","Two prior corrective actions (a training refresh, a checklist update) each reduced the rate briefly before it crept back up.","The three affected accounts use two different EHRs and two different front-desk teams."],
+    tasks:["Run a structured root-cause analysis (5-whys or fishbone) — go past the first explanation to the actual systemic cause.","Generate three genuinely different solution options (not variations of the same idea) with trade-offs for each.","Select and justify one option, with a quantified before/after estimate of the expected denial-rate impact.","Build an implementation and tracking plan, including the specific metric and checkpoint that will tell you within 30 days whether this fix is actually holding — unlike the last two.","Draft the two-minute version of this plan as if presenting it to your manager for sign-off."],
+    deliverable:"An RCA summary (≤1 page), the three options with trade-offs, and the implementation/tracking plan."
+  },
+  {
+    id:"BM-04", month:9, focus:"Ownership", scope:"Individual", title:"The Missed Target",
+    quote:"\"The honest version of the story is always more useful than the comfortable one.\"",
+    scenario:"Your pod missed its Charges KPI target for two consecutive months. Part of the miss came from a platform outage outside anyone's control; part came from a coverage gap you could have flagged sooner. Your manager has asked for a written account of what happened and what happens next.",
+    data:["Charges target: 20/day per FTE; actual: 14/day (Month 1), 15/day (Month 2).","Platform outage: 3 lost working days across the two months (uncontrollable).","A team member's leave request created a 5-day coverage gap that was known 2 weeks in advance but not resourced."],
+    tasks:["Separate honestly what was and wasn't within your control, with evidence for each.","Write the corrective action plan for the controllable factor — be specific about what changes, not just 'we'll do better.'","Draft the message to your manager that reports the miss, owns the controllable share, and leads with the plan rather than the excuse.","Set a 30/60-day recovery timeline with an interim checkpoint, and state what would trigger an earlier escalation if you're off track."],
+    deliverable:"A one-page gap analysis, the corrective action plan, and the manager communication draft."
+  },
+  {
+    id:"BM-05", month:11, focus:"Emotional Maturity", scope:"Individual", title:"The Public Callout",
+    quote:"\"How you respond in the thirty seconds after being blamed in front of leadership says more about your ceiling than any KPI does.\"",
+    scenario:"In a cross-team review with senior leadership present, a peer from another team publicly states that your team caused this month's AR spike. It's month-end, tempers are short, and the claim isn't entirely fair — your team owns part of it, but not all of it. The meeting keeps moving; you have about thirty seconds to respond before the agenda moves on.",
+    data:["AR/90+ ratio: 13.5% against a 10% threshold, worsening for the second month.","Root cause spans two teams; your team's share is real but partial.","Senior leadership (including one of NH's directs) is in the room."],
+    tasks:["Write the exact thirty-second response you would give in the room — factual, not defensive, not capitulating either.","Describe the private follow-up you would have with the peer afterward, and what you would and wouldn't say.","Propose how you would address the underlying shared-metric problem so this doesn't become a recurring public flashpoint.","Reflect: what is the difference between staying composed and staying silent? Where is that line for you in this scenario?"],
+    deliverable:"The in-room response script, the follow-up approach, and a half-page reflection."
+  },
+  {
+    id:"BM-06", month:13, focus:"Drive & Ambition", scope:"Individual → Year 1 checkpoint", title:"The Stretch Proposal",
+    quote:"\"Nobody is going to assign you the opportunity nobody has noticed yet. That's the point.\"",
+    scenario:"You're around the Year 1 mark of the Program. Leadership is inviting all 19 participants to pitch one improvement beyond their current scope for Year 2 — something no one currently owns. This is not your existing initiative or KPI; it's a genuinely new opportunity you have to identify yourself.",
+    data:["No specific gap has been assigned — you must identify the opportunity from your own visibility into the account or team.","Pitches are reviewed by L&D and may be shortlisted for a Year 2 stretch assignment.","This lands at the same checkpoint as the Year 1 salary appraisal review."],
+    tasks:["Identify one KPI, process or account opportunity that currently has no clear owner.","Build a one-page pitch: the opportunity, the target outcome, the resourcing ask, and a realistic timeline.","Make the case for why you specifically should own it — not just that it should be done.","Name the biggest risk to your own pitch succeeding, and how you'd mitigate it."],
+    deliverable:"A one-page stretch-opportunity pitch."
+  },
+  {
+    id:"BM-07", month:15, focus:"Learning Agility", scope:"Cross-team", title:"The Multi-Payer Overhaul",
+    quote:"\"When three things change at once, the leadership question isn't 'can I learn all of it' — it's 'what do I learn first.'\"",
+    scenario:"Three payers update policy in the same quarter — different CPT rules, different timely-filing windows, different secondary-claims logic. At the same time, your platform is sunsetting a legacy claim-edit tool your whole division still relies on. You now support two teams, not just your own, and both are affected differently.",
+    data:["Three payer bulletins land within an 11-day window; platform sunset is confirmed for 6 weeks out.","Team A is heavily exposed to two of the three payer changes; Team B is heavily exposed to the platform sunset.","You have limited hours to lead both teams through this simultaneously."],
+    tasks:["Prioritise which change poses the highest combined risk across both teams, and justify the ranking with data.","Build a phased adoption roadmap (not a single flat plan) that sequences the changes realistically across both teams.","Design how you will get two new hires (one per team) fully ramped in parallel without either team missing threshold.","Identify which items must be escalated externally versus solved internally, and to whom."],
+    deliverable:"A prioritised risk ranking, the phased roadmap, and the parallel ramp-up plan for the two new hires."
+  },
+  {
+    id:"BM-08", month:17, focus:"Collaboration", scope:"Cross-team", title:"The Multi-Site Handoff",
+    quote:"\"The handoff problem didn't get smaller as you got more senior. It got wider.\"",
+    scenario:"The same bottleneck pattern from BM-02 has resurfaced, but now across two different practice sites with two different EHRs feeding the same shared AR pool. You lead one site; a peer at your level leads the other. Neither of you has authority over the other's team, and both sites report the account is 'fine' individually.",
+    data:["Shared AR/90+ for the combined account: 14%, against a 10% threshold.","Site A and Site B use different EHRs with no shared workflow view today.","You and the Site B lead are peers — no reporting relationship either way."],
+    tasks:["Map the handoff across both sites, identifying exactly where the shared account's data or workflow diverges.","Draft the shared SLA you would propose to the Site B lead — specific enough to be actionable, without overstepping your authority.","Design an escalation path for when the SLA is missed, that doesn't require either of you to have formal authority over the other.","Describe how you'd bring your own manager into this without it reading as 'my peer isn't cooperating.'"],
+    deliverable:"The cross-site handoff map, the proposed SLA, and the escalation path."
+  },
+  {
+    id:"BM-09", month:19, focus:"Problem Solving", scope:"Cross-team", title:"The Systemic Root Cause",
+    quote:"\"Once the same failure shows up in three unrelated places, stop treating it as three problems.\"",
+    scenario:"Denials are now spreading across multiple categories — not just one code — and the pattern suggests an upstream systemic cause, possibly a scheduling-template error feeding bad data into multiple downstream steps. The ambiguity is real: no one has proven the cause yet, and it touches teams outside your own.",
+    data:["Denial categories affected: 3, previously unrelated in prior reporting.","Suspected common ancestor: a scheduling template used division-wide.","No team currently owns cross-category denial pattern analysis."],
+    tasks:["Design a structured investigation across the available data sources to test the scheduling-template hypothesis.","State the hypothesis as something specifically testable — what result would prove it, what result would disprove it.","Design a small pilot or phased test rather than a division-wide change on day one.","Outline the plan to scale the fix division-wide if the pilot confirms the hypothesis, including who else needs to be brought in."],
+    deliverable:"The investigation design, the testable hypothesis statement, and the pilot-to-scale plan."
+  },
+  {
+    id:"BM-10", month:21, focus:"Ownership", scope:"Pod-lead", title:"Owning Someone Else's Miss",
+    quote:"\"As an individual contributor you own your own numbers. As a lead you own the team's numbers — including the parts you didn't personally get wrong.\"",
+    scenario:"You now lead a small pod. A team member's processing error causes a KPI miss for the pod this month. The team member came to you honestly and quickly once they realised the mistake. Your manager is asking you, not the team member, to account for what happened.",
+    data:["Pod KPI: Rejections quality, threshold ≤ 0.5%; actual this month: 1.1%, traced to one team member's error on a batch upload.","The team member self-reported the error within 24 hours.","This is the team member's first significant error in eight months."],
+    tasks:["Root-cause the error itself, without shifting the framing to blame the team member upward to your manager.","Design a corrective coaching approach for the team member that treats this as a development moment, not a punishment.","Build the recovery plan for the pod's KPI this month.","Draft the message to your manager that takes accountability for the pod's result as the lead — while still being factual about what happened."],
+    deliverable:"A root-cause note, the coaching approach, the recovery plan, and the manager communication."
+  },
+  {
+    id:"BM-11", month:23, focus:"Emotional Maturity", scope:"Pod-lead", title:"The High-Stakes Feedback",
+    quote:"\"The feedback that stings the most tends to be the feedback that matters most for what comes next.\"",
+    scenario:"Your manager gives you direct, hard-to-hear feedback about your readiness for a permanent leadership role — questioning your consistency under pressure — and it happens to land in a moment where two peers are within earshot, though the feedback wasn't meant to be public. The Program is two months from closing, and this feedback carries real weight for what happens next.",
+    data:["Feedback theme: inconsistent composure under pressure over the last quarter, per your manager's observation.","Two peers were nearby when the conversation happened, though not the intended audience.","This is close to the Program's final evaluation window."],
+    tasks:["Write your genuine first-reaction thoughts, then the response you would actually give your manager in the moment — the two may differ, and that gap is worth naming.","Plan the follow-up conversation you would request, and what you specifically want to understand better.","Identify two concrete, observable actions you would take in the next 60 days to address the feedback.","Reflect: how do you tell the difference between feedback that's fair and feedback that just felt bad in the moment?"],
+    deliverable:"The reaction-vs-response reflection, the follow-up conversation plan, and the two concrete actions."
+  },
+  {
+    id:"BM-12", month:24, focus:"Drive & Ambition", scope:"Program close", title:"The Legacy Plan",
+    quote:"\"The real test of a leadership program isn't what you do inside it. It's what you keep doing once the structure disappears.\"",
+    scenario:"The Program is closing. From this point, there is no more workshop cadence, no more bimonthly case study, no more scheduled check-ins driving your development. What you do next is entirely self-directed.",
+    data:["This is the final Program data point before the Month 24 close-out review.","A new Elevate cohort is expected to begin within the next operating year.","No further structured Program touchpoints exist after this cycle."],
+    tasks:["Identify the single biggest way you've changed as a leader over the 24 months, with specific evidence, not general impressions.","Propose one concrete stretch goal for the next 90 days that you will drive without Program structure holding you to it.","Describe the mechanism you will personally use to keep yourself accountable to that goal once no one is tracking it for you.","Design a one-page plan for how you would mentor an incoming Elevate participant, drawing on what actually helped you."],
+    deliverable:"The reflection, the 90-day stretch goal, your self-accountability mechanism, and the one-page mentoring plan."
+  },
+];
+// 20 MCQ/scenario questions per workshop (W1-W8). Each: {q, options:[4], correct:idx(0-3), explain}
+const MCQ_BANK = {
+
+W1: [
+{q:"A payer publishes a mid-quarter policy update affecting two CPT codes. Before doing anything else, what should a learning-agile team lead do?", options:["Parse the bulletin and map each change to the specific KPI(s) it affects","Wait for the next scheduled workshop before acting","Escalate the entire bulletin to the payer for clarification","Assign one team member to read it and report back next week"], correct:0, explain:"Learning agility starts with fast, independent comprehension — the lead reads and maps KPI impact personally, not delegated and not delayed."},
+{q:"A platform automation update and a payer policy change land in the same week. Why is this riskier than handling each separately?", options:["Platform changes always outweigh payer changes in priority","Overlapping changes can compound impact on the same KPI from two directions simultaneously","They're unrelated — platform and payer changes never interact","Payer changes are always resolved within a day so there's no meaningful overlap"], correct:1, explain:"Overlapping changes can hit the same KPI from two angles at once, doubling the exposure. That compounding risk is precisely why they must be mapped together."},
+{q:"Your team's Authorisation Denials rate is at 0.9% against a ≤0.5% threshold, and Prior Auth volume is at 6/day against a 7/day target — both affected by the same payer change. Which do you address first?", options:["Both simultaneously, since they're caused by the same change","The volume gap, since it's a whole unit below target","The denial rate, because it's further outside its threshold and compounds over time","Neither — wait for next month's data before acting"], correct:2, explain:"The metric furthest outside its threshold, especially one that compounds (denials accumulate), needs the most urgent attention — not the one that looks numerically closest."},
+{q:"Which best describes what makes a cheat sheet 'practical' rather than just complete?", options:["It includes every detail from the original policy bulletin","It is long enough to show the team how seriously you took the change","A new hire could use it correctly on day one with no additional help","It uses formal language so it can double as documentation"], correct:3, explain:"Practicality is the real test: can someone who wasn't in the room use it correctly right away? Length and formality are not the measure."},
+{q:"Three new hires joined last quarter and now face their first system change alongside veterans. What does a learning-agile ramp plan require here?", options:["A single plan applied uniformly, since treating people differently creates friction","Delaying new hires' involvement until they have more tenure","Accounting for tenure mix explicitly — designing the plan around who actually needs what","Letting new hires self-train since they're already in learning mode"], correct:1, explain:"A learning-agile leader designs the ramp plan for the actual team in front of them. Ignoring tenure differences means the plan won't work for everyone who needs it."},
+{q:"A timely-filing window is shortened by a payer. Which KPI is most directly exposed?", options:["Rejections / Charges — submission timing is now at risk","Authorisation Denials — payer changes always hit this first","Employee satisfaction — shorter windows increase team stress","Prior Auth volume — less time means fewer authorisations per day"], correct:0, explain:"A shorter timely-filing window directly threatens the Rejections/Charges KPI by increasing the risk that claims are submitted late and rejected on timing grounds."},
+{q:"A team lead escalates 11 questions to a payer after receiving a policy bulletin. What is the likely consequence?", options:["Faster resolution, since more questions means more clarity","A stronger relationship with the payer, who will prioritise your account","It signals the team cannot parse changes independently and slows down the actual response","No consequence — payers expect high question volumes after policy changes"], correct:2, explain:"Precise, well-chosen escalations demonstrate competence. Eleven questions signal the team couldn't digest the bulletin independently, which harms credibility and delays resolution."},
+{q:"Which is the best escalation question after a payer narrows a prior-auth rule?", options:["'Can you walk us through the whole prior-auth process again from the beginning?'","'Why did you change this rule when it was working fine?'","'When will this policy be reversed?'","'For CPT code X under the updated rule, does the new requirement apply retroactively to pending auths submitted last month?'"], correct:3, explain:"A strong escalation question is specific, decision-enabling, and answerable. The others are either too vague or adversarial to get a useful response."},
+{q:"What defines a 'second-order' KPI risk in a change scenario?", options:["The first and most obvious KPI that the change directly affects","A downstream KPI that gets hit because of how the initial change cascades through the workflow","A KPI owned by a different department that is unrelated to the change","A KPI that has never exceeded its threshold and is considered safe"], correct:0, explain:"Second-order risk is the cascading impact — the less-obvious KPI that gets hit because of how the first change ripples through the process. Catching it early is a mark of genuine learning agility."},
+{q:"A rejections quality threshold of ≤0.5% is breached after a platform batching update. What is the correct first diagnostic step?", options:["Replace the platform immediately before more claims are affected","Blame the vendor publicly to start the escalation process","Determine whether the breach is isolated to the changed workflow or spread across all claim types","Ignore it temporarily — all thresholds fluctuate and this will likely self-correct"], correct:2, explain:"Isolating scope tells you whether you're dealing with a targeted fix or a systemic issue — and prevents both over-reaction and under-reaction."},
+{q:"Your team must reach full compliance in 10 working days. Which ramp-plan structure best supports that?", options:["Milestones at days 3, 6 and 9 with a mid-point verification check","One big review session on day 10 only — anything earlier is wasted time","A 30-day plan instead, since 10 days isn't realistic","No structured plan — experienced team members don't need milestones"], correct:0, explain:"Spacing milestones through the window, with a mid-point check, lets you catch and correct problems before the hard deadline. A single end-of-window review finds problems too late to fix."},
+{q:"A payer bulletin is written in dense legal language. What is the learning-agile response?", options:["Forward the original legal text to the team unedited — they should be able to read it","Translate it into plain, actionable language the team can use directly, ideally one page","Skip the sections that are hard to parse and cover the easy parts only","Wait for someone else — legal or compliance — to translate it before acting"], correct:1, explain:"The team lead's job is to make the change actionable for their team. That means translating complexity into clarity, not passing the complexity down or waiting for someone else."},
+{q:"A new automation update changes how charges are batched. What is the most learning-agile first move?", options:["Reject the update until IT reverts it — changes shouldn't happen mid-quarter","Assume batching is an IT concern and it won't affect the team's daily workflow","Only test it after go-live since pre-testing wastes time","Compare the old vs. new batching logic and map what the difference means for the team's daily work before go-live"], correct:3, explain:"Proactively comparing old vs. new logic before go-live is the definition of a learning-agile response — you find the impact before it hits the KPI, not after."},
+{q:"Why might a generic, non-account-specific cheat sheet fail in practice?", options:["It tends to be too short to be useful","It isn't tied to the team's actual accounts or daily workflows, so the team can't directly act on it","It is too visually clean — staff trust documents that look dense","It uses plain language when staff expect formal terminology"], correct:0, explain:"A cheat sheet that isn't anchored to real, current work — specific accounts, actual workflows — gives generic advice the team can't apply directly. Practicality requires specificity."},
+{q:"A team member asks: 'Why do we need to relearn this so fast?' What best models learning agility as a leader?", options:["Dismiss the question — urgency is not up for discussion","Explain the KPI exposure and the real cost of delay in plain terms, so the rationale is clear","Tell them to raise it in the next formal feedback session","Delay all training until the pushback stops"], correct:1, explain:"Explaining the 'why' in KPI terms builds understanding and buy-in. A learning-agile leader communicates the business case, not just the instruction."},
+{q:"Which is the best indicator that a ramp plan actually worked — not just that it was delivered?", options:["The plan document was emailed to the team on time","The plan ran to more than five pages so it was thorough","A verification step confirms the team can perform the new process correctly without support","Nobody complained during the training sessions"], correct:2, explain:"Delivery of a document is not the same as successful learning. The only real measure is whether the team can perform the new process correctly — which requires an explicit verification step."},
+{q:"Two changes land in the same week: a payer policy update and a platform automation update. What's the best way to communicate them to the team?", options:["Two separate emails on different days to avoid overwhelming people","A verbal mention in the stand-up with no written record","No communication until both changes are fully implemented and stable","One consolidated brief showing both changes and where they interact, so the team can see the compounded risk"], correct:0, explain:"A single consolidated brief lets the team see where the two changes interact and compound each other — which two separate emails would hide. Written record also matters for accountability."},
+{q:"Which is NOT an appropriate use of the 'escalate to payer/vendor' step?", options:["Asking whether a rule change applies retroactively to pending claims","Asking for clarification on how a specific CPT code is treated under the new rule","Raising a precise ambiguity that the bulletin genuinely did not resolve","Sending a general complaint that the change is disruptive and poorly timed"], correct:3, explain:"Escalation should surface specific, answerable questions. A general complaint about timing is not a question, won't get a useful answer, and wastes the escalation channel."},
+{q:"Your ramp plan is delivered and the deadline passes. One team member still cannot apply the new process correctly. What does this reveal about the plan?", options:["Nothing — one outlier doesn't reflect on the plan's quality","The team member is the problem, not the plan","The verification step either didn't happen or wasn't effective — the plan didn't fully work","Plans cannot realistically achieve 100% compliance so this is expected"], correct:1, explain:"A ramp plan with a real verification step catches this problem before the deadline, not after. One person still struggling post-deadline means the verification either wasn't done or didn't work."},
+{q:"A participant writes a development goal: 'improve collaboration by leading the W2 RACI exercise and volunteering for one cross-team initiative by month 6.' What makes this stronger than 'get better at collaboration'?", options:["It's longer, and longer goals are always more credible","It names specific actions, a mechanism (workshop) and a timeframe — making it trackable and actionable","The workshop reference shows alignment with the program calendar","It demonstrates ambition by setting a tight 6-month window"], correct:2, explain:"Specificity — named actions, a mechanism, and a deadline — is what makes a development goal trackable and meaningful. Vague goals like 'get better at X' cannot be acted on or verified."}
+],
+W2: [
+{q:"90+ AR climbed from 8% to 13% and a denial keeps bouncing between three teams, each of which looks fine on its own KPIs. What does this indicate?", options:["The teams are all underperforming individually","A process/handoff problem that individual KPIs don't reveal", "The KPI targets are set wrong","Nothing — this is normal variation"], correct:1, explain:"Good individual KPIs with a broken end-to-end outcome is the classic sign of a handoff, not a people, problem."},
+{q:"You don't manage the three teams involved in a cross-team bottleneck. What's your best lever?", options:["Escalate to have authority transferred to you","Influence through a shared metric, clear RACI and a collaborative process, not direct authority","Do the work yourself across all three teams","Wait until you're promoted to fix it"], correct:1, explain:"Influencing without authority is the core collaboration skill this scenario tests."},
+{q:"What is a RACI primarily used for in a cross-team workflow problem?", options:["Assigning blame after something goes wrong","Clarifying who is Responsible, Accountable, Consulted and Informed at each step","Replacing the need for communication entirely","Scheduling meetings"], correct:1, explain:"RACI clarifies roles and prevents the 'not my job' pattern that stalls cross-team work."},
+{q:"Why can a 'shared metric' help three teams that each look fine individually?", options:["It creates joint visibility into the end-to-end outcome, not just each team's slice","It removes the need for individual KPIs","It punishes underperforming teams","It has no real effect on collaboration"], correct:0, explain:"A shared metric surfaces the handoff-level problem that siloed KPIs hide."},
+{q:"In a joint huddle meant to fix a three-way handoff issue, what tone works best?", options:["Assigning blame to whichever team is present first","Neutral, process-focused language that avoids blaming any one team","Avoiding the issue entirely to keep the peace","Escalating to leadership before even meeting"], correct:1, explain:"Blame-free, process-focused framing keeps teams engaged in solving it together."},
+{q:"A recurring denial is bouncing between Eligibility/BV, Charges, and Enrollment. What should you map FIRST?", options:["Each team's individual KPI dashboard","The actual handoff sequence — who does what, in what order, with which inputs/outputs","The org chart","The annual budget"], correct:1, explain:"Mapping the real workflow reveals where the handoff actually breaks."},
+{q:"Which best describes 'diagnosis without blame' in a cross-team problem?", options:["Assigning fault to the team with the worst dashboard","Describing the process gap in neutral terms that every team can see their role in fixing","Avoiding any description of what went wrong","Escalating to HR immediately"], correct:1, explain:"Neutral, process-level diagnosis keeps every team engaged rather than defensive."},
+{q:"Why might 'each team's KPI looks fine' be misleading in this scenario?", options:["KPIs are always misleading","Individual KPIs can look healthy while the connected process between them fails","The KPIs must be calculated wrong","This can never happen in RCM"], correct:1, explain:"This is exactly the pattern that shared, end-to-end thinking is meant to catch."},
+{q:"What is the risk of a huddle agenda that starts with 'here's what went wrong and who did it'?", options:["No risk — it's efficient","It triggers defensiveness and blocks honest collaboration on the real fix","It's the fastest way to a fix","Teams always respond well to being blamed first"], correct:1, explain:"Opening with blame typically shuts down the honest information-sharing needed to fix the process."},
+{q:"A 'lightweight control' to catch a recurring handoff issue earlier next time might be:", options:["A monthly full audit of every claim","A simple shared checkpoint or flag at the handoff point itself","Removing the KPI entirely","Assigning one person to do all three teams' work"], correct:1, explain:"A lightweight, well-placed control at the actual handoff point is more sustainable than a heavy audit."},
+{q:"Why is influence, not authority, the right frame for this scenario?", options:["Because authority never works","Because the team lead doesn't manage the other two teams, so buy-in must be earned, not ordered","Because escalation is always faster","Because RACIs don't require influence"], correct:1, explain:"Without formal authority over the other teams, influence and shared ownership are the practical path."},
+{q:"Which signals a workflow map is actually useful, not just decorative?", options:["It's colorful","It shows the specific handoff where the process is breaking, with inputs/outputs at each step","It has the company logo on it","It's one page regardless of complexity"], correct:1, explain:"Usefulness comes from actually locating the broken handoff, not the visual polish."},
+{q:"What's the danger of skipping the RACI step and going straight to a huddle?", options:["There is no danger","Without clarified ownership, the same ambiguity that caused the bottleneck can persist after the meeting","Huddles always fail without RACIs","RACIs are only for large companies"], correct:1, explain:"A huddle without clarified ownership risks solving the symptom but not the recurring ambiguity."},
+{q:"Which best reflects 'collaboration' as a competency, versus just being agreeable?", options:["Avoiding all disagreement","Actively aligning people across teams toward a shared, measurable outcome","Doing everyone else's job for them","Never raising a hard truth"], correct:1, explain:"Collaboration is active alignment toward a shared outcome — not conflict avoidance."},
+{q:"A shared metric works best when it is:", options:["Vague enough that no team feels responsible","Specific and jointly owned so all three teams track the same real outcome","Only visible to leadership","Changed every week"], correct:1, explain:"Specificity and joint ownership are what make a shared metric actually change behavior."},
+{q:"If the AR/90+ ratio doesn't improve after a huddle and RACI, what's the most collaborative next step?", options:["Give up on the cross-team approach","Revisit the RACI and shared metric with the teams to see what's not working, together","Escalate blame to one specific team","Remove the metric"], correct:1, explain:"Collaboration means iterating together on what isn't working, not abandoning the approach or assigning blame."},
+{q:"Which is a sign the 'not my fault' pattern is happening across teams?", options:["Every team's individual KPI is healthy while the shared outcome (AR/90+) keeps worsening","All three teams request a joint meeting proactively","One team volunteers to own the whole process","KPIs are trending in the same direction across all teams"], correct:0, explain:"Healthy individual metrics next to a worsening shared outcome is the tell-tale sign."},
+{q:"What's the best first output of a handoff-mapping exercise?", options:["A finalized policy document","A clear picture of where in the sequence the process actually breaks down","A performance review for each team member","A budget request"], correct:1, explain:"The map's job is to locate the break, which is the foundation for everything that follows."},
+{q:"Why nominate the shared metric jointly with all three teams, rather than imposing it top-down?", options:["It doesn't matter who defines it","Joint ownership increases the chance each team actually tracks and acts on it","Top-down metrics always work better","Only leadership should ever define metrics"], correct:1, explain:"A metric the teams help define is a metric they're more likely to actually use."},
+{q:"After the RACI and shared metric are agreed, what best signals the collaboration is actually working, not just documented?", options:["The RACI document exists in a shared folder","The three teams are visibly using the shared metric to catch and jointly resolve issues before they escalate","No one mentions the account again","The huddle was held exactly once"], correct:1, explain:"Real collaboration shows up in ongoing joint use of the metric and RACI, not just the existence of the documents."}
+],
+
+W3: [
+{q:"Clinical denials rose from 0.3% to 1.4% against a 0.5% threshold. What should come before proposing a fix?", options:["A structured root-cause analysis identifying the vital few reasons behind the volume","Immediately hiring more staff","A team-wide apology email","Reducing the KPI threshold instead"], correct:0, explain:"Root-cause analysis before action is the core of problem solving as a competency."},
+{q:"What does a Pareto analysis of denial reasons help identify?", options:["The most expensive claim in the batch","The vital few reasons that explain most of the denial volume","The newest team member","The payer with the best reputation"], correct:1, explain:"Pareto (80/20) analysis isolates the few reasons driving most of the volume, focusing the fix."},
+{q:"A '5-Whys' exercise is designed to:", options:["Generate five unrelated ideas","Dig past the first, surface-level explanation to the actual root cause","Assign five people to the same task","Create five new KPIs"], correct:1, explain:"5-Whys repeatedly asks 'why' to move from symptom to root cause."},
+{q:"A fishbone diagram organizes potential causes by categories such as:", options:["Alphabetical order only","People, process, system, and payer/external factors","Cost only","Random brainstorming with no structure"], correct:1, explain:"Fishbone (Ishikawa) diagrams structure causes across categories like people, process, system, and external factors."},
+{q:"Why is it important to separate 'root cause' from 'symptom' with evidence?", options:["It isn't important — any explanation will do","Fixing a symptom without the root cause means the problem recurs","Symptoms are always the same as root causes","Evidence slows down the process unnecessarily"], correct:1, explain:"Treating a symptom instead of the root cause is why problems come back — the classic RCA trap."},
+{q:"A denial export shows ~40% medical necessity, ~25% missing documentation, ~20% coding mismatch, ~15% other. Where should analysis focus first?", options:["The 15% 'other' bucket, since it's a mystery","The largest categories (medical necessity and missing documentation), since they explain most of the volume","Whichever payer is most well known","All categories equally regardless of size"], correct:1, explain:"Focusing on the largest drivers first is the Pareto principle in action."},
+{q:"What's the difference between a corrective action and a preventive action?", options:["There is no difference","Corrective clears the existing backlog; preventive stops the problem from recurring","Preventive only applies to new hires","Corrective is always more important than preventive"], correct:1, explain:"CAPA (Corrective And Preventive Action) requires both: fixing what already broke, and stopping recurrence."},
+{q:"Which is a red flag that a proposed fix is symptom-level, not root-cause?", options:["It addresses the top Pareto category","It only speeds up appeals without addressing why the denials happen in the first place","It includes a documentation training update","It's tied to a specific CPT code"], correct:1, explain:"Speeding up appeals treats the downstream symptom, not why the denial rate rose in the first place."},
+{q:"A realistic recovery estimate for denials returning to threshold should include:", options:["Only a dollar figure with no timeline","Both the recoverable dollar amount and a credible timeline back to the 0.5% threshold","A guess with no supporting data","A promise to fix it 'immediately' with no detail"], correct:1, explain:"A credible RCA output pairs a quantified impact with a realistic timeline."},
+{q:"Why might some denials not be recoverable on appeal?", options:["All denials are always recoverable","Some reflect a legitimate, unappealable payer determination rather than a process error","Appeals are never worth attempting","Payers automatically approve all appeals"], correct:1, explain:"Distinguishing recoverable from non-recoverable denials is part of a realistic RCA, not blanket optimism."},
+{q:"Which best demonstrates rigor in root-cause analysis?", options:["Stopping at the first plausible explanation","Testing the leading hypothesis against the actual data before acting on it","Skipping data review to move faster","Assuming the same root cause every time"], correct:1, explain:"Rigor means validating the hypothesis with evidence, not just accepting the first idea."},
+{q:"A coding mismatch is identified as a top denial driver. What's a reasonable corrective + preventive pairing?", options:["Corrective: re-code and resubmit the affected claims. Preventive: coder training and a pre-submission validation check.","Corrective: ignore it. Preventive: none needed.","Corrective: fire the coder. Preventive: none needed.","Corrective: raise the threshold. Preventive: none needed."], correct:0, explain:"Fixing the current batch (corrective) and building a check to stop recurrence (preventive) is the CAPA pattern."},
+{q:"What's the value of quantifying 'recoverable dollars' in an RCA report?", options:["It has no value to leadership","It translates the problem into business impact leadership can prioritize against other work","It replaces the need for a root cause","It's only useful for accounting teams"], correct:1, explain:"Quantified impact helps leadership weigh this fix against competing priorities."},
+{q:"Which of these is the best evidence that a root cause (not just a symptom) has been found?", options:["A confident guess from the most senior person in the room","Data showing the proposed cause explains the pattern across the affected claims","A root cause found once for one claim, generalized without checking others","No evidence is needed if the explanation sounds reasonable"], correct:1, explain:"Evidence that explains the pattern, not just a single instance, is what separates a validated root cause from a guess."},
+{q:"Why structure the analysis by provider AND payer AND CPT code, not just one dimension?", options:["It's unnecessary complexity","Multi-dimensional analysis can reveal whether the pattern is provider-specific, payer-specific, or code-specific — which changes the fix","One dimension is always sufficient","Payers don't vary in their denial patterns"], correct:1, explain:"Which dimension the pattern clusters around changes what the right fix actually is."},
+{q:"A team proposes 'just work harder on appeals' as the fix for rising denials. What's missing?", options:["Nothing, this is a complete fix","Any root-cause analysis of why the denials are happening in the first place","A dollar estimate","A deadline"], correct:1, explain:"Without RCA, 'work harder' is a symptom-level response that doesn't stop the denials from recurring."},
+{q:"What should trigger escalation beyond the RCA to leadership or the payer?", options:["Every single denied claim, regardless of pattern","A root cause tied to a payer-side policy or system issue outside the team's control","Never — everything should stay within the team","Only issues under 5% of volume"], correct:1, explain:"Root causes outside the team's control (like a payer-side issue) are exactly what should be escalated."},
+{q:"Which is the clearest sign leadership wants root causes, 'not a list of symptoms'?", options:["They ask only for the total number of denials","They ask for why the rate rose and what will stop it recurring, not just a count","They ask for a symptom checklist","They ask for the denial list sorted alphabetically"], correct:1, explain:"Asking 'why' and 'what stops recurrence' is a direct ask for root-cause thinking."},
+{q:"A CAPA table typically includes:", options:["Root cause, corrective action, preventive action, owner and timeline","Only a list of denied claim numbers","A performance review score","A random assignment of tasks"], correct:0, explain:"A CAPA table structures the fix: what's wrong, what corrects it, what prevents it, who owns it, and by when."},
+{q:"Why estimate a realistic (not optimistic) timeline to bring denials back under threshold?", options:["Realism protects credibility and sets expectations leadership can actually plan around","Optimistic timelines are always better for morale","Timelines don't matter in an RCA","Only the root cause matters, not the plan to fix it"], correct:0, explain:"A credible, realistic timeline is part of what makes an RCA actionable rather than aspirational."}
+],
+
+W4: [
+{q:"Your pod missed DM productivity target (15/day, running ~11) and breached CCH quality (2% threshold, running ~3.2%) over three weeks, with some real external pressures. What should you lead with?", options:["A list of the pressures and absences as the full explanation","An honest, numeric gap analysis followed by what you personally own and will fix","Waiting for the pressures to resolve on their own","Asking for the target to be lowered"], correct:1, explain:"Ownership means leading with the honest numbers and what you control, not the excuses."},
+{q:"Two absences and a half-day system outage happened during the miss. How should these be treated in an ownership plan?", options:["As the entire explanation, ending the analysis there","As real, named factors — while still separating what was controllable and owning that part explicitly","Ignored entirely since they're inconvenient","Used to argue the target should never apply to you again"], correct:1, explain:"Real factors get acknowledged, but ownership requires still separating out and owning the controllable share."},
+{q:"What's the risk of a recovery plan with only an end-date and no interim check-ins?", options:["No risk, deadlines are what matter","Problems surface too late to correct course before the deadline","Interim check-ins always slow progress down","End-dates are unnecessary if the plan looks good"], correct:1, explain:"Daily/weekly check-ins let you catch and correct drift before the final deadline arrives."},
+{q:"'Own what's controllable, escalate what's not' — which is the best example of professional escalation?", options:["'This isn't my fault, ask IT.'","'The half-day outage affected throughput; I've adjusted this week's ramp accordingly and am flagging the outage pattern to IT for review.'","Saying nothing about the outage at all","Escalating every minor issue immediately with no context"], correct:1, explain:"Professional escalation names the factor, shows what you already adjusted, and flags it constructively — not as a shrug of blame."},
+{q:"Which weekly commitment best reflects real ownership?", options:["'I'll try to do better.'","'I will report DM output and CCH error rate every Friday, with a specific action taken that week.'","No commitment, just wait and see next month","A commitment with no specific metric attached"], correct:1, explain:"A specific metric and a specific action, reported on a set cadence, is what a real commitment looks like."},
+{q:"You control task allocation, daily prioritisation and quality checks — but not headcount or the platform. What does 'ownership' mean here?", options:["Ownership only counts if you control everything","Owning fully what's within your control, and being clear and professional about what isn't","Refusing to take any responsibility since some factors are external","Taking blame for headcount and platform issues too, even though you don't control them"], correct:1, explain:"Ownership is calibrated to your actual span of control — full accountability for what you do control."},
+{q:"A 30-day recovery plan should include:", options:["Only a single number for day 30","Daily check-ins and a weekly ramp target back to standard","No metrics, just good intentions","A plan to quietly lower the target instead"], correct:1, explain:"Structure (daily check-ins, weekly ramp) is what turns a recovery 'plan' into something trackable."},
+{q:"What is the danger of an ownership narrative that blames the system outage for the entire three-week miss?", options:["There's no danger, outages are always the full story","It obscures the controllable portion of the miss that actually needs fixing","Outages should always be blamed fully","Leadership prefers narratives that assign no personal accountability"], correct:1, explain:"If the outage becomes the whole story, the controllable part — and the fix — gets lost."},
+{q:"Which best demonstrates 'accountability without blame-shifting'?", options:["Naming external factors accurately, then clearly stating what you personally will do differently","Naming only external factors and stopping there","Blaming a team member by name to leadership","Avoiding any mention of external factors, even real ones"], correct:0, explain:"Accurate context plus a clear personal commitment — not blame-shifting in either direction — is the standard."},
+{q:"Why self-audit against target and threshold in actual numbers, rather than a general impression?", options:["Numbers make the gap analysis vague","Precise numbers make the size of the gap and the plan to close it concrete and trackable","General impressions are always more honest","Numbers aren't necessary if the intent is good"], correct:1, explain:"Specific numbers turn 'we had a rough few weeks' into a trackable, closeable gap."},
+{q:"What's the best cadence for reporting recovery progress to leadership after a miss like this?", options:["Once, at the very end of the recovery period","A regular cadence (e.g. weekly) with the specific metric and what changed","Only when things go well","Never — let leadership ask if they want an update"], correct:1, explain:"Regular, proactive reporting on the metric is what ownership looks like in practice, not waiting to be asked."},
+{q:"A colleague on your pod suggests quietly not mentioning the outage at all in your report. What's the risk?", options:["No risk, it makes the numbers look better","It removes real context leadership needs, and looks worse if discovered later than if disclosed upfront","This is the professional standard","Leadership prefers incomplete reports"], correct:1, explain:"Omitting real, relevant context undermines trust — transparency paired with ownership is the stronger position."},
+{q:"Which best reflects realism in a 30-day ramp, given a genuine system outage occurred?", options:["Pretending the outage never happened","Building the ramp around the actual remaining work, accounting for the lost time honestly","Extending the deadline indefinitely with no new date","Ignoring the target entirely going forward"], correct:1, explain:"A realistic ramp accounts for what actually happened, rather than pretending or over- or under-correcting."},
+{q:"What's the value of stating 'the one metric I will report weekly' in your commitment?", options:["It creates unnecessary paperwork","It gives leadership and yourself a single, clear signal of progress instead of a vague narrative","Metrics are never useful in recovery plans","It replaces the need for a ramp plan"], correct:1, explain:"A single clear tracked metric is more useful than a vague narrative of 'things are improving.'"},
+{q:"Which is the clearest boundary-setting statement between 'own' and 'escalate'?", options:["'Everything is my fault, including the platform.'","'I own daily prioritisation and quality checks; I'll escalate the platform outage pattern to IT since that's outside my control.'","'None of this is my fault.'","No boundary is needed — own everything, always."], correct:1, explain:"A clear, accurate boundary between what you own and what you escalate is the heart of this competency."},
+{q:"Why might leadership specifically ask for 'an ownership plan, not a list of reasons'?", options:["They don't want any context at all, ever","They want to see accountability and a forward plan, not just an explanation of what happened","Reasons are irrelevant information leadership never wants","This phrasing has no particular meaning"], correct:1, explain:"This phrasing is a direct signal: they want the forward-looking accountable plan, with context kept brief."},
+{q:"A recovery plan hits its weekly target for two weeks then slips in week three. What's the ownership-minded response?", options:["Stop reporting since it's discouraging","Report the slip honestly with the same transparency as the successes, and adjust the plan","Only report the two good weeks","Blame the earlier outage retroactively for the new slip"], correct:1, explain:"Consistent, honest reporting — good weeks and bad — is what sustained ownership looks like."},
+{q:"What differentiates a 'gap analysis' from a complaint about the target being too hard?", options:["Nothing, they're the same thing","A gap analysis quantifies the shortfall and what's driving it, aimed at closing it — not questioning the target's fairness","A complaint is more constructive","Gap analyses are only for annual reviews"], correct:1, explain:"A gap analysis is diagnostic and forward-looking; a complaint about the target is neither."},
+{q:"Which best supports long-term credibility with your manager after a missed target?", options:["A one-time apology and no further follow-up","Consistent, numbers-based updates showing the recovery plan is actually being executed","Avoiding the topic in future 1:1s","Asking the manager to stop tracking the KPI"], correct:1, explain:"Sustained, numbers-based follow-through — not a single apology — is what rebuilds credibility."},
+{q:"What's the risk of defining 'what I will escalate' too broadly?", options:["No risk at all","It can look like avoiding ownership of things that are actually within your control","Broad escalation always strengthens your case","Managers prefer broad escalation lists"], correct:1, explain:"Escalating things you actually control undermines the credibility of your ownership plan."}
+],
+
+W5: [
+{q:"The EOB queue is at double its normal volume and a normally reliable colleague snaps at you over a reassigned account. What's the composed first response?", options:["Snap back to match their energy","Stay factual and de-escalate, without dismissing that they're clearly overloaded","Report them immediately with no direct conversation","Ignore them entirely going forward"], correct:1, explain:"Emotional maturity means staying composed and addressing the real overload, not escalating or avoiding."},
+{q:"Your manager gives you critical feedback about a missed batch in front of the team. The feedback is fair but poorly timed. What's the mature response?", options:["Argue back in the moment to save face","Accept the substance in the moment, then follow up privately about the timing constructively","Complain to peers about the manager afterward","Ignore the feedback entirely since the timing was wrong"], correct:1, explain:"Separating substance from delivery — accepting the fair part, addressing the timing issue separately and constructively — is the mature path."},
+{q:"What's the value of a 'personal composure routine' for high-volume periods?", options:["It has no real value, composure can't be planned for","It gives you a deliberate before/during/after approach instead of reacting in the moment","It replaces the need for any team support","It's only useful for very senior leaders"], correct:1, explain:"A planned routine — not just willpower in the moment — is what sustains composure under repeated pressure."},
+{q:"Why write a 'reflective note' identifying your own triggers after a tense scenario, rather than only focusing on others' behavior?", options:["Self-awareness of your own triggers is a prerequisite for regulating your own reactions under pressure","Only other people's behavior matters in conflict","Reflection wastes time that should go to the EOB queue","Triggers are irrelevant to emotional maturity"], correct:0, explain:"Emotional maturity starts with self-awareness of your own triggers, not just managing others."},
+{q:"A colleague is 'usually dependable' but snapped under overload. What does this suggest about the right response?", options:["Treat it as a permanent character flaw","Recognize it as likely situational overload, and address the workload alongside the relationship","Escalate for disciplinary action immediately","Avoid the colleague going forward"], correct:1, explain:"Reading the behavior as situational (overload), not characterological, shapes a much more constructive response."},
+{q:"Which best reflects 'regulating rather than reacting' under pressure?", options:["Responding immediately with the first emotional impulse","Pausing briefly to choose a measured response instead of an impulsive one","Suppressing all emotion and saying nothing ever","Reacting more strongly to seem in control"], correct:1, explain:"Regulation is choosing a measured response — not suppression, and not raw reaction."},
+{q:"What is the best way to follow up with a manager whose fair feedback was delivered publicly and awkwardly?", options:["Never raise the timing issue at all","A private, constructive conversation acknowledging the substance while raising the delivery","A public confrontation to match how it was delivered","Avoid the manager until the issue is forgotten"], correct:1, explain:"Private, constructive follow-up addresses the real issue (timing) without escalating conflict."},
+{q:"Why design a composure routine around 'before, during, and after' high-pressure periods rather than just 'during'?", options:["Before and after don't matter","Preparation before and recovery after both affect how well you handle the pressure itself","Only the 'during' phase is relevant to emotional maturity","This structure adds unnecessary complexity"], correct:1, explain:"Preparation and recovery are part of what makes in-the-moment composure sustainable."},
+{q:"A team member is overloaded and snaps publicly. What's a de-escalating response that also preserves the relationship?", options:["Publicly calling out their behavior in return","Privately acknowledging the pressure they're under and addressing the account issue calmly","Escalating to HR before any direct conversation","Pretending the incident didn't happen and changing nothing"], correct:1, explain:"Private acknowledgement plus calm problem-solving preserves the relationship while addressing the real issue."},
+{q:"What's the risk of accepting critical feedback's substance but never raising the poor timing with your manager?", options:["No risk — silence is always safest","The pattern of public, poorly-timed feedback may continue unaddressed","Raising it would always backfire","Managers prefer employees who never raise concerns"], correct:1, explain:"If the timing issue is never raised constructively, the pattern is likely to repeat."},
+{q:"Which best distinguishes emotional maturity from simply 'staying quiet'?", options:["They're the same thing","Emotional maturity includes composure AND constructively addressing what needs to be addressed — not just silence","Staying quiet is always the mature choice","Emotional maturity means suppressing all future conversation about the incident"], correct:1, explain:"Composure isn't avoidance — mature handling still addresses the real issue, just constructively and at the right time."},
+{q:"What's a good 'early sign' to watch for that you're starting to escalate under pressure?", options:["Feeling completely calm","Noticing rising frustration, a sharper tone, or the urge to respond immediately without thinking","Wanting to take a break","Asking a clarifying question"], correct:1, explain:"Recognizing early physiological/emotional signals is what allows you to regulate before reacting."},
+{q:"As a future leader, why does protecting the team's composure at month-end matter?", options:["It doesn't affect team performance","Sustained high pressure without support degrades quality and morale over time","Leaders should focus only on their own composure","Team composure is entirely outside a leader's influence"], correct:1, explain:"A leader's role includes shaping the environment so pressure doesn't repeatedly erode the team's performance and wellbeing."},
+{q:"A blunt piece of feedback turns out to be accurate, even though it stung. What's the mature next step?", options:["Dismiss it because of how it felt","Separate the sting from the substance and act on what's true and useful in it","Hold a grudge against whoever gave it","Never accept feedback delivered bluntly again"], correct:1, explain:"Extracting the useful substance from an uncomfortable delivery is a hallmark of emotional maturity."},
+{q:"Which is the best long-term outcome of handling a public snap-and-feedback day with composure?", options:["Nothing changes either way","Preserved working relationships and a credible, professional reputation under pressure","Being seen as passive","Avoiding all future high-pressure situations"], correct:1, explain:"Composure under real pressure is what builds a leader's credibility over time."},
+{q:"Why is 'de-escalation' different from 'giving in'?", options:["They're the same","De-escalation lowers tension while still addressing the real issue; giving in avoids the issue entirely","De-escalation means avoiding all future conflict","Giving in is always the mature choice"], correct:1, explain:"De-escalation is about tone and timing, not abandoning the substance of the issue."},
+{q:"What's a reasonable 'during' element of a composure routine at month-end?", options:["A brief pause/breath before responding to a tense moment","Ignoring the queue entirely","Responding to every message the instant it arrives, regardless of tone","Avoiding the team for the rest of the day"], correct:0, explain:"A brief pause before responding is a practical, in-the-moment composure technique."},
+{q:"Which best reflects a constructive response to a manager's feedback, even if delivered publicly?", options:["'You're wrong and shouldn't have said that here.'","'You're right about the batch — I'll fix it. Could we talk 1:1 next time on things like this?'","Saying nothing at all, in the moment or later","Complaining about the manager to the rest of the team"], correct:1, explain:"Accepting the substance while constructively raising delivery, later and privately, models real maturity."},
+{q:"What's the benefit of naming your own trigger in writing (a reflective note) rather than just thinking about it?", options:["Writing has no additional benefit over just thinking","Writing it down clarifies the pattern and makes it easier to catch and manage next time","Reflective notes are only useful for formal reviews","This step should be skipped to save time"], correct:1, explain:"Writing forces clarity and creates something concrete you can refer back to under future pressure."},
+{q:"Which best captures the goal of this workshop's competency, Emotional Maturity?", options:["Never feeling stress","Recognizing pressure, regulating your response, and handling conflict and feedback constructively","Avoiding all feedback and conflict entirely","Reacting strongly to show you care"], correct:1, explain:"Emotional maturity is about regulated, constructive handling of real pressure — not the absence of stress."}
+],
+
+W6: [
+{q:"Elevate offers an initial salary increment after three consecutive months above threshold, with further growth across months 4–24. What does this reward structure primarily encourage?", options:["A single burst of effort early on with no follow-through","Sustained performance over time, not just a short-term push","Ignoring the program after the first increment","Competing against other participants directly"], correct:1, explain:"Consecutive-month tracking is designed to reward sustained performance, not a one-time effort."},
+{q:"A strong personal development plan for this program should be built around:", options:["Vague hopes with no measurable goals","SMART goals tied to measurable program metrics across the full 24 months","A single goal for month 1 only","Goals set entirely by someone else with no input from you"], correct:1, explain:"SMART (specific, measurable, achievable, relevant, time-bound) goals tied to real metrics make a plan trackable, not aspirational."},
+{q:"Why self-assess honestly against both behavioural competencies and leadership components before setting goals?", options:["Self-assessment isn't useful for goal-setting","Knowing your genuine strongest and weakest areas focuses the plan on what will move the needle most","You should only ever focus on your strongest areas","Leadership components don't need self-assessment"], correct:1, explain:"An honest self-assessment targets development effort where it will matter most, especially the weaker areas."},
+{q:"What's the risk of a development plan with goals but no mapped actions or workshops?", options:["No risk, goals alone are sufficient","Goals without concrete actions tend to stay aspirational rather than becoming real progress","Actions are optional details","Workshops are unrelated to personal goals"], correct:1, explain:"Goals need to be mapped to specific actions and resources (like workshops or stretch assignments) to become real."},
+{q:"Why define your own quarterly checkpoints rather than waiting for the annual review only?", options:["Quarterly checkpoints are unnecessary busywork","Regular checkpoints let you catch drift and adjust course well before the stakes are highest","Annual-only review is always sufficient for a 24-month program","Checkpoints should only be set by your manager, never by you"], correct:1, explain:"Frequent self-checkpoints catch problems early, rather than discovering them only at a high-stakes annual review."},
+{q:"Which best reflects 'genuine ownership of development' rather than passive participation?", options:["Waiting to be assigned every workshop and stretch project","Proactively identifying your own goals, actions and support needs, and tracking progress yourself","Only doing the minimum required to avoid the hard-exit threshold","Assuming L&D will manage your entire career path for you"], correct:1, explain:"Ownership means driving your own plan, not waiting passively for the program to do it for you."},
+{q:"What makes a goal 'measurable' in this program's context?", options:["It sounds ambitious","It's tied to a specific program metric or threshold that can be checked objectively","It's written in detail regardless of whether it can be checked","It's the same as every other participant's goal"], correct:1, explain:"Measurability means tying the goal to something objectively checkable, like a KPI or score threshold."},
+{q:"Why identify 'support you will ask for' as part of the plan, not just goals?", options:["Support requests are irrelevant to a development plan","Naming what you need (from manager, L&D, or peers) makes the plan realistic and gives others a way to help","Asking for support signals weakness and should be avoided","Support should never be part of a written plan"], correct:1, explain:"A credible plan names the support needed to actually achieve the goals — not just the goals in isolation."},
+{q:"Which best distinguishes Drive & Ambition from simply 'wanting to be promoted'?", options:["They're identical","Drive & Ambition shows up as a concrete plan, specific goals and follow-through, not just a stated desire","Wanting promotion is sufficient on its own","Ambition is only about job titles"], correct:1, explain:"This competency is demonstrated through structured goals and action — not just aspiration."},
+{q:"A participant sets one vague goal: 'get better at everything.' What's missing?", options:["Nothing — broad goals are best","Specificity: which competencies, tied to which metrics, by when","Ambition — the goal isn't big enough","A workshop reference"], correct:1, explain:"Without specificity, a broad goal like this can't be tracked or acted on."},
+{q:"Why does the plan need to span the full 24 months rather than just the next few?", options:["Only near-term planning matters","The program itself runs 24 months, so a credible plan should account for growth and checkpoints across that full arc","Long plans are always better regardless of program length","24-month plans are impossible to write meaningfully"], correct:1, explain:"Matching the plan's horizon to the program's actual length makes it realistic and complete."},
+{q:"Which of these best supports 'mapping goals to actions'?", options:["'I want to improve collaboration' with no further detail","'I will improve collaboration by leading the W2 case study RACI exercise and volunteering for one cross-team initiative by month 6'","A goal with no timeframe","An action with no connected goal"], correct:1, explain:"Concrete, dated actions tied explicitly to the goal are what make the mapping real."},
+{q:"What's a reasonable use of a quarterly self-checkpoint?", options:["Only checking in if something has already gone wrong","Reviewing progress against your SMART goals and adjusting actions if you're off track","Ignoring checkpoints if you feel confident","Replacing the program's official evaluation entirely"], correct:1, explain:"Checkpoints are a proactive, regular review — not just a reaction to a problem after the fact."},
+{q:"Naming your two weakest competencies honestly in a self-assessment is valuable because:", options:["It has no practical value","It directs limited development time to where it will have the most impact","Weaknesses should never be documented","Only strengths should be discussed in a development plan"], correct:1, explain:"Honest identification of weak areas is what makes the resulting plan actually useful, not just flattering."},
+{q:"Which best reflects a 'written support contract' as part of a development plan?", options:["An informal, unspoken assumption about what others will do","A clear, written statement of what you're asking for and what you'll bring in return","A one-way list of demands with nothing offered in return","Something only managers write, never participants"], correct:1, explain:"A 'contract' implies mutual, written clarity — what you need and what you're offering in return."},
+{q:"Why tie personal goals to 'at least one stretch assignment', per the task list?", options:["Stretch assignments are unrelated to personal development","Applying a goal in a real stretch assignment turns it into demonstrated capability, not just intention","Stretch assignments are optional busywork","Only Year 2 participants get stretch assignments"], correct:1, explain:"A stretch assignment is where a development goal gets tested against real work, not just stated on paper."},
+{q:"What's the benefit of aligning your personal goals to workshops still ahead of you (e.g. W7 Leading People)?", options:["No benefit — workshops are generic and unrelated to personal goals","It lets you use upcoming structured learning deliberately, in service of your own specific goals","Workshops shouldn't be referenced in a personal plan","Every goal must map to W1 specifically"], correct:1, explain:"Deliberately tying your plan to upcoming workshops turns generic curriculum into targeted development."},
+{q:"A participant hits every quarterly checkpoint but never revisits or updates the plan. What's missing?", options:["Nothing, hitting checkpoints is sufficient","Genuine ownership includes adjusting the plan as circumstances and self-knowledge evolve, not just checking boxes","Plans should never be revised once written","Checkpoints matter more than the plan itself"], correct:1, explain:"A living plan that gets adjusted, not just checked off, is what real ownership of development looks like."},
+{q:"Which best reflects the overall aim of Drive & Ambition as scored in this program?", options:["Wanting the reward regardless of effort","Demonstrated, well-structured initiative toward measurable goals sustained across the program","Talking about ambition in interviews","Comparing yourself unfavorably to peers"], correct:1, explain:"The competency rewards structured, sustained initiative — not just stated desire for advancement."},
+{q:"A participant's plan sets goals but leaves 'support needed' blank because they'd rather not ask for help. What's the effect?", options:["No effect — self-sufficiency is always better","The plan becomes less realistic, since most goals of real substance need some support to achieve","Blank sections are preferred by L&D","This shows stronger ambition than naming support needs"], correct:1, explain:"Naming real support needs makes a plan credible; omitting them out of pride tends to make ambitious goals less achievable, not more impressive."}
+],
+
+W7: [
+{q:"You've just been given a 5-person pod with one bored high performer, one struggling new hire, and an uneven workload. What's the first leadership step?", options:["Keep doing the technical work yourself to avoid disruption","Build a skill/will matrix to understand where each person actually is","Reassign everyone randomly","Wait for the workload to even out on its own"], correct:1, explain:"Understanding skill and will levels for each person is the foundation for any delegation or coaching plan."},
+{q:"A high performer is bored on the pod. What's the best delegation response?", options:["Give them more of the same repetitive work","Stretch them with a more meaningful or complex task, delegated with real trust","Ignore the boredom since output is still fine","Move them off the pod entirely"], correct:1, explain:"Boredom in a high performer is best addressed with a genuine stretch, not just more of the same."},
+{q:"A new team member is struggling with a specific work-type. What best reflects a coaching plan?", options:["Assume they'll figure it out unsupervised","A structured 30-day ramp with specific, supportive check-ins","Reassigning the work-type to someone else permanently","Giving critical feedback with no plan attached"], correct:1, explain:"A structured ramp with check-ins is a coaching plan; simply reassigning or leaving them unsupported is not."},
+{q:"What's the risk of a leader continuing to 'do the work' instead of delegating, after being given a pod?", options:["No risk — the leader's technical skill stays sharp","The pod doesn't develop, and the leader has no capacity to actually lead","This is always the right approach for new leads","Delegation is optional if the leader is skilled enough"], correct:1, explain:"Staying in individual-contributor mode blocks both the leader's capacity to lead and the team's growth."},
+{q:"What does 'monitoring without micromanaging' look like in practice?", options:["Checking every task multiple times a day","Defining what to watch, how often, and clear triggers for when to step in — then stepping back otherwise","Never checking in at all","Only checking in when something has already gone wrong"], correct:1, explain:"Deliberate, defined monitoring cadence and step-in triggers — not constant oversight — is the balance this competency requires."},
+{q:"Which is a stronger delegation conversation opener with a high performer?", options:["'Here's some extra work since you seem bored.'","'I'd like you to own this — here's why it matters and what success looks like, and I trust you to run it.'","'Do this because I said so.'","'This is just busywork, but do it anyway.'"], correct:1, explain:"Framing the delegated task with purpose and trust is what makes it a genuine stretch, not just extra work."},
+{q:"Why build a skill/will matrix rather than assuming everyone needs the same management approach?", options:["A matrix is unnecessary paperwork","Different combinations of skill and will require different leadership responses (e.g. coaching vs. delegating vs. directing)","Skill and will never actually vary across a team","Only skill matters, not will"], correct:1, explain:"The skill/will framework exists because a one-size-fits-all approach misses what each person actually needs."},
+{q:"The pod owns AR/90+ (≤10%) and Rejections (20/day at ≤0.5%). What does 'monitoring' these as a leader (not an IC) require?", options:["Doing the underlying work yourself every day","Tracking the pod's aggregate performance and stepping in only where trends or individuals need support","Ignoring the KPIs since they're now the team's responsibility, not yours","Checking each team member's work line by line every hour"], correct:1, explain:"A leader monitors trends and intervenes selectively — not doing the work personally or ignoring it entirely."},
+{q:"Two members are quietly overloaded while the leader still does 'all the work'. What's the underlying issue?", options:["The team is simply too small","The leader hasn't yet made the shift from doing the work to distributing and leading it","The KPIs are set too high","There is no real issue here"], correct:1, explain:"This is the classic IC-to-leader transition problem the workshop is built to address."},
+{q:"Which best reflects a workload rebalancing plan, versus just reacting to complaints?", options:["Waiting until someone complains, then shifting one task","Proactively fitting work to each person's actual capacity and stretching the high performer deliberately","Splitting all tasks exactly equally regardless of skill or capacity","Assigning all new work to whoever is quietest"], correct:1, explain:"A deliberate plan based on actual capacity and skill, not equal splitting or reactive shifts, is the goal."},
+{q:"What's a good 'step-in trigger' for a leader monitoring pod KPIs?", options:["Never stepping in, regardless of trend","A KPI trending toward its threshold for two consecutive periods","Every single daily fluctuation, regardless of size","Only when leadership above you asks about it"], correct:1, explain:"A defined trigger (like a sustained trend) is what allows monitoring without over-managing day-to-day noise."},
+{q:"Why is 'the temptation to take work back' specifically called out as a risk for a new pod leader?", options:["It isn't actually a risk","New leaders often revert to the comfort of individual work under pressure, which undermines delegation and their own leadership growth","Taking work back is always the safest choice","Only experienced leaders face this temptation"], correct:1, explain:"This reversion is a well-known trap for leaders transitioning from IC roles, especially under pressure."},
+{q:"A delegation script for a high performer should include:", options:["Only the task, with no context","Why the task matters, what success looks like, and an expression of trust in their ownership","A list of everything that could go wrong","No mention of expectations at all"], correct:1, explain:"Purpose, success criteria and trust are what separate real delegation from simply assigning a task."},
+{q:"What's the best cadence principle for monitoring a pod's KPIs without micromanaging?", options:["As often as possible, ideally hourly","A defined, appropriate rhythm (e.g. daily KPI glance, weekly deep review) matched to what actually needs oversight","Never — trust the team completely with zero oversight","Randomly, with no consistent pattern"], correct:1, explain:"A defined, appropriate rhythm — not maximal or zero oversight — is the balance this competency asks for."},
+{q:"Why does a coaching plan for a struggling new hire need a defined ramp period (e.g. 30 days), not an open-ended timeline?", options:["Open-ended timelines are always better","A defined ramp creates accountability and a clear point to assess whether the coaching is working","Ramps are only symbolic and don't need real structure","New hires never need structured support"], correct:1, explain:"A defined ramp period creates a checkpoint to honestly assess progress, rather than indefinite drift."},
+{q:"Which best reflects 'balancing people and KPI outcomes' as a leadership criterion?", options:["Focusing only on KPIs and ignoring team wellbeing","Making decisions that protect both the pod's numbers and the individuals' development and workload","Focusing only on individual happiness regardless of KPI performance","Treating people and KPIs as unrelated to each other"], correct:1, explain:"This criterion explicitly requires holding both dimensions together, not optimizing one at the expense of the other."},
+{q:"A pod member's workload is uneven but no one has said anything. What should a leader do?", options:["Wait for someone to complain first","Proactively identify the imbalance through observation and data, then address it","Assume no complaints means no problem","Only address it during the annual review"], correct:1, explain:"Proactive identification, not waiting for a complaint, is what distinguishes real pod leadership."},
+{q:"What's the value of explicitly defining 'what you watch and how often' for pod KPIs, in writing?", options:["No value, it's just documentation for its own sake","It creates a concrete, shareable standard for monitoring that avoids drifting into micromanagement or neglect","Written monitoring plans are unnecessary if the leader is experienced","Only leadership above the pod lead needs this in writing"], correct:1, explain:"A concrete written standard is what keeps monitoring consistent, rather than drifting to one extreme or the other."},
+{q:"Why is 'you can no longer do all the work yourself' central to this workshop's premise?", options:["It isn't actually central to the scenario","It marks the core transition this workshop addresses — from individual contributor to leader who delegates and monitors","Doing all the work yourself is always sustainable","This only applies to pods larger than five people"], correct:1, explain:"This line names the exact transition the workshop's competency (Leadership/Delegation) is built around."},
+{q:"Which best shows a leader successfully balancing the struggling new hire's ramp with the high performer's stretch, at the same time?", options:["Focusing entirely on one person and ignoring the other until it's resolved","Running both the coaching plan and the delegation conversation in parallel, each matched to what that person actually needs","Treating both team members identically regardless of their skill/will differences","Waiting until the new hire is fully ramped before addressing the high performer at all"], correct:1, explain:"Real pod leadership runs multiple, differentiated plans in parallel — not sequentially or identically."}
+],
+
+W8: [
+{q:"You're acting team lead for a simulated quarter facing a payer change, a denial bottleneck, a resignation, month-end pressure, and an audit — all in sequence. What does the Capstone primarily test?", options:["A single competency in isolation","Integration of all competencies simultaneously under realistic, escalating pressure","Only technical KPI knowledge","Whether you can avoid every event"], correct:1, explain:"Unlike single-competency workshops, the Capstone specifically tests integrated performance across all of them at once."},
+{q:"A sudden resignation destabilises workload mid-quarter. What should the turnaround plan show?", options:["No adjustment — treat it as if nothing happened","How you redistributed the workload, communicated the change, and maintained KPI coverage","A plan to only fill the vacancy and change nothing else","Ignoring the workload gap until a replacement is hired"], correct:1, explain:"The capstone specifically wants to see people-leadership decisions in response to real disruption, not just a static plan."},
+{q:"Why must the unit stay above the 52.5% standing threshold even while multiple crises unfold?", options:["The threshold doesn't apply during simulations","It reflects the real program rule that active standing must be maintained regardless of pressure — the core test of resilience under load","Only KPIs above 90% matter in the capstone","The threshold is only symbolic in this exercise"], correct:1, explain:"The 52.5% threshold is the same real program rule — the capstone tests whether you can hold the line under simultaneous pressure."},
+{q:"A panel presentation for the capstone should be built around:", options:["A long narrative with no clear structure","Problem, actions taken, expected impact, and risks — concise and defensible","Only the problem statement, with no plan","Slides with no data, only opinions"], correct:1, explain:"A clear, structured narrative (problem → action → impact → risk) is what panel-ready communication looks like."},
+{q:"During the mock panel Q&A, what best demonstrates 'clarity and credibility of panel defence'?", options:["Deflecting hard questions", "Answering directly, acknowledging gaps honestly, and defending the reasoning with evidence","Reading directly from the slides with no elaboration","Refusing to answer unscripted questions"], correct:1, explain:"Direct, evidence-based, honest answers under real questioning are the standard for this criterion."},
+{q:"Why does the capstone deliberately sequence multiple crises rather than presenting one problem at a time?", options:["To make the exercise unnecessarily difficult for its own sake","To simulate the real, compounding pressure a leader faces and test integration, not isolated problem-solving","Sequencing has no particular purpose","Because single-problem exercises are impossible to design"], correct:1, explain:"Real leadership rarely faces one clean problem at a time — the sequencing is intentional and realistic."},
+{q:"Which best reflects strong 'people-leadership under pressure' during the capstone's month-end and resignation events?", options:["Absorbing all the extra work personally without adjusting the team's plan","Making visible, communicated decisions about workload, coaching, and composure that the team can see and follow","Avoiding any visible decision-making until the crisis passes","Delegating everything without any check-in"], correct:1, explain:"Visible, communicated leadership decisions — not silent over-functioning or total hands-off delegation — is what this criterion rewards."},
+{q:"A cross-team denial bottleneck pushes 90+ AR over threshold during the capstone. What does 'cross-functional coordination' require here?", options:["Waiting for another team to fix it unprompted","Actively coordinating with the other teams involved, similar to the collaboration skills from W2, but under live pressure","Escalating to the panel to solve it for you","Ignoring the bottleneck since it's not your team's fault"], correct:1, explain:"This event specifically tests whether earlier collaboration skills (W2) hold up under real capstone pressure."},
+{q:"Why does the capstone ask for a written reflection on 'which competencies you leaned on most' after the simulation?", options:["Reflection has no value at this stage","It builds self-awareness of your actual pattern under pressure, which is valuable for real leadership going forward","This is only a formality with no bearing on development","Reflections are scored higher than the actual performance"], correct:1, explain:"Honest reflection on which competencies you actually drew on is valuable data for your own ongoing development."},
+{q:"What separates an 'integrated' turnaround plan from a series of separate, disconnected fixes?", options:["An integrated plan addresses the KPIs, the people decisions, and the communication together as one coherent response","There's no real difference","An integrated plan ignores people decisions entirely","Separate fixes are always preferred since they're simpler"], correct:0, explain:"Integration means the operational, people, and communication threads reinforce each other, not sit in isolation."},
+{q:"A quality audit occurs late in the simulated quarter. What does a strong response demonstrate?", options:["Hiding weak areas from the auditors","Transparent presentation of KPI status including honest gaps, alongside a credible recovery narrative","Refusing to engage with the audit process","Blaming the resignation entirely for any audit findings"], correct:1, explain:"Transparency about real gaps, paired with a credible plan, is the standard the audit event is testing."},
+{q:"Why is the capstone assessed against 'the full leadership rubric' rather than a single-criterion rubric like the earlier workshops?", options:["Because it's testing integration of everything at once, mirroring what real leadership actually requires","Single-criterion rubrics are easier to score, so this is arbitrary","The full rubric is only used for convenience","This workshop doesn't actually get assessed differently"], correct:0, explain:"The whole point of the capstone is integrated assessment, so it uses the comprehensive rubric, not a single-competency one."},
+{q:"Which best reflects a credible 'expected impact' section in the panel presentation?", options:["Vague claims of improvement with no numbers","Specific, quantified projections tied to the affected KPIs and a realistic timeline","No mention of impact at all","Impact claims copied from a previous, unrelated quarter"], correct:1, explain:"Specific, quantified, timeline-bound projections are what make an 'expected impact' section credible to a panel."},
+{q:"A panelist challenges an assumption in your turnaround plan. What's the strongest response?", options:["Insisting the assumption is definitely correct with no further explanation","Acknowledging the assumption, explaining the reasoning behind it, and noting what would change your approach if it proves wrong","Changing your entire plan on the spot without explanation","Refusing to discuss assumptions at all"], correct:1, explain:"Defending assumptions with reasoning, while being honest about what would change them, is panel-grade credibility."},
+{q:"Why must workload redistribution after the resignation event still protect the pod's core KPIs?", options:["KPIs become irrelevant once a resignation occurs","The scenario tests whether you can adapt the team structure while still holding the line on the numbers that matter","Only the resigned person's KPIs matter going forward","Workload and KPIs are unrelated during a disruption"], correct:1, explain:"The realistic test is whether you can adapt people decisions without losing grip on the KPIs the unit is accountable for."},
+{q:"What's the best use of the personal reflection's 'two biggest development areas going forward'?", options:["Listing generic areas unrelated to what actually happened in the simulation","Naming specific areas the simulation itself revealed, to carry into your Leadership Initiative or ongoing development","Skipping this section since the capstone itself is the final assessment","Copying another participant's reflection"], correct:1, explain:"The most useful reflection ties directly to what the simulation actually revealed about you, feeding forward into future development."},
+{q:"Which best reflects 'quality and feasibility of the turnaround plan' as a capstone criterion?", options:["A plan addressing every KPI with specific, credible actions, owners and timelines","A plan that only mentions the KPI with the biggest number","A plan with big ambitions but no specific actions","A plan copied from the W3 root-cause workshop with no adaptation"], correct:0, explain:"Feasibility and completeness — specific actions with owners and timelines across all affected KPIs — is what this criterion rewards."},
+{q:"Why does the capstone specifically feed the 20% Leadership Evaluation's Capstone component, separate from the Workshop Case Studies component?", options:["It's an arbitrary scoring choice","It's the single highest-stakes, most integrated assessment in the program, warranting its own weighted component (25%)","Capstone scores are actually identical to the W1-W7 average","The two components measure exactly the same thing"], correct:1, explain:"Its integrated, high-stakes nature is exactly why it's weighted and tracked as its own distinct 25% component."},
+{q:"What is the single best summary of what the Capstone is designed to reveal?", options:["Whether you can memorize the program's rules","Whether you can lead — integrating judgment, people-leadership and communication — when several real pressures hit at once","Whether you can avoid every possible crisis","Whether you work faster than your peers"], correct:1, explain:"This is the core purpose of the Capstone: revealing integrated leadership capability under realistic, simultaneous pressure."},
+{q:"Two-assessor scoring (one live observer, one panel scorer) is used in the Capstone. Why does this matter?", options:["It doesn't matter, one assessor would be equivalent","It reduces single-rater bias and captures both in-the-moment behaviour and the final defence, given how high-stakes this assessment is","It's only done to save time","Only the panel scorer's view counts in practice"], correct:1, explain:"Given the Capstone's weight (25% of Leadership Evaluation), two independent assessors improve reliability of a high-stakes score."}
+]
+
+};
+
+/* =========================================================
+   EMPLOYEES + DATE HELPERS
+   ========================================================= */
+const EMPLOYEES = [
+  {id:1,name:"Nawera Aziz"},
+  {id:2,name:"Iqra Aly"},
+  {id:3,name:"Hania Zulfiqar"},
+  {id:4,name:"Shahzad Shahid"},
+  {id:5,name:"Humdan Waseem"},
+  {id:6,name:"Javeria Tariq"},
+  {id:7,name:"Mudassar Abbas"},
+  {id:8,name:"Adnan Hafeez"},
+  {id:9,name:"Hamza Ikram"},
+  {id:10,name:"Madiha Shoukat"},
+  {id:11,name:"Muhammad Rauf"},
+  {id:12,name:"Fatima Tariq"},
+  {id:13,name:"Waseem Akhtar"},
+  {id:14,name:"Faiza Tariq"},
+  {id:15,name:"Saad Tariq"},
+  {id:16,name:"Sara Abdulhaq"},
+  {id:17,name:"Ahmed Mursalin"},
+  {id:18,name:"Ambreen Sabir"},
+  {id:19,name:"Umair Farman"}
+];
+
+const PROGRAM_START = new Date(2026,7,1); // Month 1 = August 2026
+const FIRST_MONDAY = new Date(2026, 7, 17); // Aug 17, 2026 — Week 1 starts here — Week 1 starts here
+const TODAY = new Date();
+
+function fmtDate(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function weekRange(weekNum){
+  const start = new Date(FIRST_MONDAY); start.setDate(start.getDate() + (weekNum-1)*7);
+  const end = new Date(start); end.setDate(end.getDate()+4);
+  return { start, end, label: `${fmtDate(start)} – ${fmtDate(end)}` };
+}
+function monthLabel(monthNum){
+  const d = new Date(PROGRAM_START.getFullYear(), PROGRAM_START.getMonth()+monthNum-1, 1);
+  return d.toLocaleString('en-US',{month:'long',year:'numeric'});
+}
+function monthStart(monthNum){ return new Date(PROGRAM_START.getFullYear(), PROGRAM_START.getMonth()+monthNum-1, 1); }
+
+function weekStatus(weekNum){
+  const {start,end} = weekRange(weekNum);
+  if(TODAY < start) return 'future';
+  if(TODAY > end) return 'past';
+  return 'current';
+}
+function cycleStatus(monthNum){
+  const start = monthStart(monthNum);
+  const end = new Date(start.getFullYear(), start.getMonth()+2, 0); // roughly a 2-month-ish open window before next cycle
+  if(TODAY < start) return 'future';
+  if(TODAY > end) return 'past';
+  return 'current';
+}
+
+/* =========================================================
+   STORAGE LAYER
+   ========================================================= */
+const WCACHE = {}; // workshop responses, per employee
+const PCACHE = {}; // project responses, per employee
+
+function defaultWorkshopData(){
+  const d = {};
+  WORKSHOPS.forEach(w => {
+    const isW1 = (w.id === "W1");
+    d[w.id] = {
+      mcq: Array(20).fill(null),
+      mcqScore: isW1 ? 20 : null,
+      openEnded: Array(w.tasks.length).fill(""),
+      submittedAt: isW1 ? "2026-08-21T09:00:00.000Z" : null,
+      _preCompleted: isW1 ? true : undefined
+    };
+  });
+  return d;
+}
+function defaultProjectData(){
+  const d = {};
+  PROJECT_CYCLES.forEach(c => d[c.id] = { openEnded: Array(c.tasks.length).fill(""), submittedAt: null });
+  return d;
+}
+
+async function loadWorkshopData(empId){
+  if(WCACHE[empId]) return WCACHE[empId];
+  try{
+    const r = await window._store.get('workshop-emp:'+empId, false);
+    WCACHE[empId] = r ? JSON.parse(r) : defaultWorkshopData();
+  }catch(e){ WCACHE[empId] = defaultWorkshopData(); }
+  return WCACHE[empId];
+}
+async function saveWorkshopData(empId){
+  try{ await window._store.set('workshop-emp:'+empId, JSON.stringify(WCACHE[empId]), false); return true; }
+  catch(e){ console.error(e); return false; }
+}
+async function loadProjectData(empId){
+  if(PCACHE[empId]) return PCACHE[empId];
+  try{
+    const r = await window._store.get('project-emp:'+empId, false);
+    PCACHE[empId] = r ? JSON.parse(r) : defaultProjectData();
+  }catch(e){ PCACHE[empId] = defaultProjectData(); }
+  return PCACHE[empId];
+}
+async function saveProjectData(empId){
+  try{ await window._store.set('project-emp:'+empId, JSON.stringify(PCACHE[empId]), false); return true; }
+  catch(e){ console.error(e); return false; }
+}
+async function loadAll(){
+  for(const e of EMPLOYEES){ await loadWorkshopData(e.id); await loadProjectData(e.id); }
+}
+async function loadSyncedScores(eid){ try{ const r=await window._store.get('elevate-sync:scores:'+eid,false); return r?JSON.parse(r):null; }catch(e){ return null; } }
+
+/* =========================================================
+   APP STATE
+   ========================================================= */
+const TABS = [
+  {id:"myworkshops", label:"My Workshops"},
+  {id:"myproject", label:"My Project"}
+];
+let activeTab = "myworkshops";
+let currentEmpId = 1;
+const PROJECT_ADMIN_PASS = "ElevateAdmin@2026";
+let projectAdminUnlocked = false;
+
+// Per-week admin passwords — share the relevant one with employees before each in-class session
+// W1 has no password — it is always open and pre-marked complete
+const WEEK_PASSWORDS = {
+  2: "CureMD_@123",
+  3: "CureMD_@221",
+  4: "CureMD_@123",
+  5: "CureMD_@221",
+  6: "CureMD_@123",
+  7: "CureMD_@221",
+  8: "CureMD_@123"
+};
+
+// Session-only unlock tracking (does NOT persist — must re-enter each visit)
+// W1 is always unlocked — no password needed
+const sessionUnlockedWeeks = new Set();
+
+function isWorkshopUnlocked(wk) {
+  if (wk === 1) return true; // W1 always open — pre-marked complete
+  return sessionUnlockedWeeks.has(wk);
+}
+
+function isProjectUnlocked(eid) {
+  if (projectAdminUnlocked) return true;
+  const d = WCACHE[eid];
+  if (!d) return false;
+  return !!(d["W8"] && d["W8"].submittedAt);
+}
+
+function tryUnlockWeek(weekNum) {
+  const input = document.getElementById('weekPassInput');
+  const errorEl = document.getElementById('weekPassError');
+  if (!input) return;
+  const entered = input.value.trim();
+  if (entered === WEEK_PASSWORDS[weekNum]) {
+    sessionUnlockedWeeks.add(weekNum);
+    renderMyWorkshops();
+  } else {
+    if (errorEl) {
+      errorEl.style.display = 'block';
+    }
+    input.value = '';
+    input.focus();
+  }
+}
+
+function employeeOptions(selectedId){
+  return EMPLOYEES.map(e=>`<option value="${e.id}" ${e.id==selectedId?'selected':''}>${e.id}. ${e.name}</option>`).join('');
+}
+function statusChip(status){
+  const map = { current:['current','This week'], past:['open','Open'], future:['future','Not yet'] };
+  const [cls,label] = map[status] || ['open','Open'];
+  return `<span class="status-chip ${cls}">${label}</span>`;
+}
+
+
+/* =========================================================
+   EXPORT — Employee saves their data as a JSON file for L&D
+   ========================================================= */
+async function exportMyData(){
+  await loadWorkshopData(currentEmpId);
+  await loadProjectData(currentEmpId);
+  const emp = EMPLOYEES.find(e=>e.id===currentEmpId);
+  const wdata = WCACHE[currentEmpId];
+  // Build assessment integrity summary
+  const integritySummary = {};
+  WORKSHOPS.forEach(function(w){
+    const rec = wdata[w.id];
+    if(rec && rec._antiCheat){
+      const ac = rec._antiCheat;
+      integritySummary[w.id] = {
+        tabSwitches: ac.tabSwitches,
+        violations: ac.violations,
+        timeUsed: ac.timeUsed ? Math.floor(ac.timeUsed/60)+'m '+ac.timeUsed%60+'s' : null,
+        startedAt: ac.startedAt,
+        completedAt: ac.completedAt,
+        tabSwitchLog: ac.tabSwitchLog || [],
+        status: ac.tabSwitches===0 ? "CLEAN" : (ac.tabSwitches<=2 ? "MINOR" : "FLAGGED")
+      };
+    }
+  });
+  const exportData = {
+    _format: "elevate_employee_export_v1",
+    _exportedAt: new Date().toISOString(),
+    employeeId: currentEmpId,
+    employeeName: emp.name,
+    _assessmentIntegrity: integritySummary,
+    workshops: wdata,
+    projects: PCACHE[currentEmpId]
+  };
+  const json = JSON.stringify(exportData, null, 2);
+  const filename = `Elevate_${emp.name.replace(/\s+/g,'_')}_${currentEmpId}.json`;
+  const blob = new Blob([json], {type:'application/json'});
+
+  // Try the native share sheet first (Android Chrome + iOS Safari) so the
+  // file can be handed straight to WhatsApp without going through Downloads.
+  let sharedNatively = false;
+  try{
+    const file = new File([blob], filename, {type:'application/json'});
+    if(navigator.canShare && navigator.share && navigator.canShare({files:[file]})){
+      await navigator.share({
+        files:[file],
+        title:'RCM Elevate Submission',
+        text:`RCM Elevate export — ${emp.name} (${currentEmpId})`
+      });
+      sharedNatively = true;
+    }
+  }catch(e){
+    // AbortError = user cancelled the share sheet themselves — don't fall back noisily
+    if(e && e.name === 'AbortError'){ return; }
+  }
+
+  if(sharedNatively){
+    alert("\u2705 Shared: " + filename + "\n\nMake sure you picked the RCM Elevate WhatsApp group in the share screen. Do this after every submission.");
+    return;
+  }
+
+  // Fallback for browsers/devices without file-sharing support (e.g. most desktops):
+  // save the file, then the person attaches it to WhatsApp manually.
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert("\u2705 Exported: " + filename + "\n\nYour phone saved this to Downloads/Files instead of opening the share screen.\n\nOpen WhatsApp \u2192 the RCM Elevate group \u2192 attach this file from Downloads/Files and send it.\n\nDo this after every submission so L&D can import your work.");
+}
+
+
+/* Admin-only: clear data for a specific week or project cycle */
+function adminClearWeek(weekId){
+  var pass = prompt("\ud83d\udd12 Admin password required to clear " + weekId + " data:");
+  if(pass !== PROJECT_ADMIN_PASS){ if(pass!==null) alert("Incorrect admin password."); return; }
+  if(!confirm("Clear all submission data for " + weekId + " for the current employee?\n\nThis will reset their MCQ answers, written tasks and submission status for this week. They will need to redo it.")) return;
+  var wdata = WCACHE[currentEmpId];
+  if(wdata && wdata[weekId]){
+    wdata[weekId] = { mcq: Array(20).fill(null), mcqScore: null, openEnded: [], submittedAt: null };
+    saveWorkshopData(currentEmpId).then(function(){
+      alert("\u2705 " + weekId + " data cleared for employee " + currentEmpId + ".");
+      renderMyWorkshops();
+    });
+  }
+}
+function adminClearProject(cycleId){
+  var pass = prompt("\ud83d\udd12 Admin password required to clear " + cycleId + " data:");
+  if(pass !== PROJECT_ADMIN_PASS){ if(pass!==null) alert("Incorrect admin password."); return; }
+  if(!confirm("Clear submission data for " + cycleId + "?")) return;
+  var pdata = PCACHE[currentEmpId];
+  if(pdata && pdata[cycleId]){
+    pdata[cycleId] = { openEnded: [], submittedAt: null };
+    saveProjectData(currentEmpId).then(function(){
+      alert("\u2705 " + cycleId + " data cleared.");
+      renderMyProject();
+    });
+  }
+}
+
+/* =========================================================
+   NAV + DISPATCH
+   ========================================================= */
+function renderNav(){
+  const nav = document.getElementById('navbar');
+  const projLocked = !isProjectUnlocked(currentEmpId);
+  nav.innerHTML = TABS.map(t=>{
+    const locked = (t.id==="myproject" && projLocked);
+    const icon = locked ? " \ud83d\udd12" : "";
+    return `<button data-tab="${t.id}" class="${t.id===activeTab?'active':''} ${locked?'locked':''}">${t.label}${icon}</button>`;
+  }).join('');
+  nav.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      if(b.dataset.tab==="myproject"){
+        await loadWorkshopData(currentEmpId);
+        if(!isProjectUnlocked(currentEmpId)){
+          const choice = confirm("\ud83d\udd12 Project tab is locked for employees until all 8 workshops are complete.\n\nProgress: " + WORKSHOPS.filter(w=>WCACHE[currentEmpId][w.id].submittedAt).length + "/8 submitted.\n\nAre you an Admin? Click OK to enter the admin password.");
+          if(!choice) return;
+          const pass = prompt("Enter Admin password to unlock the Project tab:");
+          if(pass === PROJECT_ADMIN_PASS){
+            projectAdminUnlocked = true;
+          } else {
+            if(pass !== null) alert("Incorrect admin password.");
+            return;
+          }
+        }
+      }
+      if(b.dataset.tab==="review"){
+        const pass = prompt("\ud83d\udd12 L&D Review is password-protected.\nEnter access code:");
+        if(pass !== LD_REVIEW_PASS){ if(pass!==null) alert("Incorrect password."); return; }
+      }
+      activeTab=b.dataset.tab; renderNav(); renderMain();
+    });
+  });
+}
+async function renderMain(){
+  stopAntiCheat();
+  const main = document.getElementById('main');
+  main.innerHTML = `<div class="card">Loading…</div>`;
+  if(activeTab==="myworkshops") await renderMyWorkshops();
+  else if(activeTab==="myproject") await renderMyProject();
+}
+
+/* =========================================================
+   MY WORKSHOPS
+   ========================================================= */
+let wkState = { week: (()=>{ for(const w of WORKSHOPS){ if(weekStatus(w.week)!=='past') return w.week; } return 8; })() };
+
+function progressStrip(items, doneIds, currentId){
+  return `<div class="progress-strip">${items.map(it=>{
+    const done = doneIds.includes(it.id);
+    const cur = it.id===currentId;
+    return `<div class="progress-dot ${done?'done':''} ${cur&&!done?'current':''}" title="${it.id}">${done?'✓':it.id.replace(/^W|^BM-0?/,'')}</div>`;
+  }).join('')}</div>`;
+}
+
+async function renderMyWorkshops(){
+  await loadWorkshopData(currentEmpId);
+  const wdata = WCACHE[currentEmpId];
+  const w = WORKSHOPS.find(w=>w.week===wkState.week);
+  const rec = wdata[w.id];
+  const range = weekRange(w.week);
+  const status = weekStatus(w.week);
+  const submitted = !!rec.submittedAt;
+  const doneIds = WORKSHOPS.filter(ww=>wdata[ww.id].submittedAt).map(ww=>ww.id);
+
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="card">
+      <h2>My Workshops</h2>
+      <p class="hint">Eight weekly take-home workshops, one per week, August–September 2026. Each has 20 quick questions plus a short written case study.</p>
+      <div class="row">
+        <div class="field"><label>Your name</label><select id="empSelect">${employeeOptions(currentEmpId)}</select></div>
+        <div class="field"><label>Week</label><select id="weekSelect">
+          ${WORKSHOPS.map(ww=>`<option value="${ww.week}" ${ww.week===w.week?'selected':''}>Week ${ww.week} — ${ww.title}</option>`).join('')}
+        </select></div>
+      </div>
+      ${progressStrip(WORKSHOPS, doneIds, w.id)}
+
+      <h3 style="margin-top:4px;">Week ${w.week} · ${w.title} <span style="color:var(--gray); font-weight:400;">— ${w.competency}</span></h3>
+      <div style="margin-bottom:10px;">${statusChip(status)} <span style="color:var(--gray); font-size:12.5px; margin-left:8px;">Window: ${range.label}</span>
+      ${submitted?`<span class="status-chip done" style="margin-left:8px;">Submitted</span>`:''}</div>
+
+      <h3>The Scenario</h3>
+      <p class="hint" style="color:#22262e;">${w.scenario}</p>
+      <h3>Your Data &amp; Context</h3>
+      <ul style="margin:0 0 10px; padding-left:20px; font-size:14px;">${w.data.map(d=>`<li style="margin-bottom:4px;">${d}</li>`).join('')}</ul>
+      <h3>Deliverable</h3>
+      <p class="hint" style="color:#22262e;">${w.deliverable}</p>
+
+      ${submitted ? `
+        <div class="score-banner">
+          <span class="big">${rec.mcqScore}/20</span> on the comprehension check · submitted ${new Date(rec.submittedAt).toLocaleString()}
+        </div>
+      ` : ''}
+
+      <div id="formArea"></div>
+    </div>
+  `;
+
+  document.getElementById('empSelect').addEventListener('change', e=>{ currentEmpId=Number(e.target.value); renderMyWorkshops(); });
+  document.getElementById('weekSelect').addEventListener('change', e=>{ wkState.week=Number(e.target.value); renderMyWorkshops(); });
+
+  const formArea = document.getElementById('formArea');
+  const unlocked = isWorkshopUnlocked(w.week);
+  if (!unlocked && !submitted) {
+    formArea.innerHTML = `
+      <div class="lock-banner">
+        <div class="lock-icon">🔒</div>
+        <h3>Week ${w.week} is Locked</h3>
+        <p style="margin-bottom:6px;">Your facilitator will share the unlock password before this session.</p>
+        <p style="color:#B0C4FF; font-size:13px; margin-bottom:20px;">Each week has its own password — you will need to enter it every time you visit.</p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center;">
+          <input type="password" id="weekPassInput" placeholder="Enter session password…"
+            style="padding:10px 14px; border-radius:8px; border:1px solid rgba(255,196,36,.4);
+                   background:rgba(255,255,255,.08); color:#fff; font-size:14px; width:240px;
+                   outline:none;"
+            onkeydown="if(event.key==='Enter') tryUnlockWeek(${w.week})" />
+          <button onclick="tryUnlockWeek(${w.week})"
+            style="padding:10px 22px; background:linear-gradient(135deg,#FFC424,#F5A623);
+                   color:#0E2657; border:none; border-radius:20px; font-weight:800;
+                   cursor:pointer; font-size:14px;">
+            Unlock
+          </button>
+        </div>
+        <p id="weekPassError" style="color:#FF6B6B; font-size:13px; margin-top:10px; display:none;">
+          ❌ Incorrect password. Ask your facilitator for this week's password.
+        </p>
+      </div>`;
+    // Auto-focus the password field
+    setTimeout(() => { const f = document.getElementById('weekPassInput'); if(f) f.focus(); }, 50);
+    return;
+  }
+  if(submitted){
+    const isPreCompleted = rec._preCompleted === true;
+    const bannerContent = isPreCompleted
+      ? `<span style="font-size:16px;font-weight:700;color:var(--green);">&#x2705; Week 1 was delivered in-class &mdash; marked complete.</span><br><span style="font-size:12px;color:var(--gray);">No take-home assessment required for Week 1.</span>`
+      : `<span class="big">${rec.mcqScore}/20</span> comprehension check &middot; submitted ${new Date(rec.submittedAt).toLocaleString()}<br><span style="font-size:12px;color:var(--gray);">Submission is final and cannot be edited.</span><br><button onclick="exportMyData()" style="background:#FFC424;color:#0E2657;border:none;padding:6px 14px;border-radius:16px;font-weight:700;cursor:pointer;margin-top:8px;font-size:12px;">&#x1F4E4; Export &amp; Share to WhatsApp</button> <button onclick="adminClearWeek('${w.id}')" style="background:transparent;color:var(--red);border:1px solid var(--red);padding:5px 12px;border-radius:16px;font-weight:600;cursor:pointer;margin-top:8px;font-size:11px;margin-left:6px;">&#x1F512; Admin: Clear ${w.id}</button>`;
+    formArea.innerHTML = `<div class="score-banner">${bannerContent}</div>`;
+    return;
+  }
+
+  renderWorkshopForm(formArea, w, rec);
+}
+
+
+/* =========================================================
+   ANTI-CHEAT ENGINE — timer, tab-switch detection, copy protection
+   ========================================================= */
+var acState = { active:false, timer:null, seconds:1800, violations:0, tabSwitches:0, tabSwitchLog:[], startedAt:null };
+
+function startAntiCheat(weekId){
+  acState.active = true;
+  acState.seconds = 1800; // 30 minutes
+  acState.violations = 0;
+  acState.tabSwitches = 0;
+  acState.tabSwitchLog = [];
+  acState.startedAt = new Date().toISOString();
+  
+  // Timer countdown
+  if(acState.timer) clearInterval(acState.timer);
+  acState.timer = setInterval(function(){
+    acState.seconds--;
+    updateTimerDisplay();
+    if(acState.seconds <= 0){
+      clearInterval(acState.timer);
+      autoSubmitWorkshop();
+    }
+  }, 1000);
+  
+  // Tab visibility detection
+  document.addEventListener('visibilitychange', onTabSwitch);
+  
+  // Disable right-click on form area
+  document.addEventListener('contextmenu', preventContext);
+  
+  // Detect copy/paste on MCQ area
+  document.addEventListener('copy', onCopyAttempt);
+  document.addEventListener('paste', onPasteAttempt);
+  
+  // Keyboard shortcuts prevention (Ctrl+C on MCQ area)
+  document.addEventListener('keydown', onKeyBlock);
+}
+
+function stopAntiCheat(){
+  acState.active = false;
+  if(acState.timer) clearInterval(acState.timer);
+  document.removeEventListener('visibilitychange', onTabSwitch);
+  document.removeEventListener('contextmenu', preventContext);
+  document.removeEventListener('copy', onCopyAttempt);
+  document.removeEventListener('paste', onPasteAttempt);
+  document.removeEventListener('keydown', onKeyBlock);
+  // Remove overlay if present
+  var overlay = document.getElementById('tabWarningOverlay');
+  if(overlay) overlay.remove();
+}
+
+function updateTimerDisplay(){
+  var el = document.getElementById('acTimer');
+  if(!el) return;
+  el.style.opacity = '1';
+  var infoEl = document.getElementById('acTimerInfo');
+  if(infoEl) infoEl.textContent = 'Time remaining — auto-submits when time runs out';
+  var m = Math.floor(acState.seconds/60);
+  var s = acState.seconds % 60;
+  el.textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  el.className = 'time' + (acState.seconds<=300?' warning':'');
+  var vEl = document.getElementById('acViolations');
+  if(vEl) vEl.textContent = acState.tabSwitches>0 ? '\u26a0\ufe0f Tab switches: '+acState.tabSwitches : '';
+}
+
+function onTabSwitch(){
+  if(!acState.active) return;
+  if(document.hidden){
+    acState.tabSwitches++;
+    acState.violations++;
+    acState.tabSwitchLog.push({ at:new Date().toISOString(), secondsElapsed:1800-acState.seconds, event:"tab_switch_"+acState.tabSwitches });
+    // Show warning overlay
+    var overlay = document.createElement('div');
+    overlay.id = 'tabWarningOverlay';
+    overlay.className = 'tab-warning-overlay';
+    overlay.innerHTML = '<h2>\u26a0\ufe0f Tab Switch Detected</h2><p>You left the assessment tab. This has been recorded.<br><br>Tab switches: <b>'+acState.tabSwitches+'</b><br><br>Please stay on this tab until you submit.</p><button onclick="this.parentElement.remove()" style="margin-top:20px;padding:10px 30px;background:#FFC424;color:#0E2657;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-size:14px;">Return to Assessment</button>';
+    document.body.appendChild(overlay);
+  }
+}
+
+function preventContext(e){
+  if(!acState.active) return;
+  var target = e.target;
+  if(target.closest && target.closest('.mcq-block')){
+    e.preventDefault();
+  }
+}
+
+function onCopyAttempt(e){
+  if(!acState.active) return;
+  var target = e.target;
+  if(target.closest && target.closest('.mcq-block')){
+    e.preventDefault();
+    acState.violations++;
+  }
+}
+
+function onPasteAttempt(e){
+  if(!acState.active) return;
+  // Allow paste in textareas (open-ended answers) but track it
+}
+
+function onKeyBlock(e){
+  if(!acState.active) return;
+  // Block Ctrl+U (view source), Ctrl+Shift+I (dev tools) during assessment
+  if(e.ctrlKey && (e.key==='u' || e.key==='U')){ e.preventDefault(); acState.violations++; }
+  if(e.ctrlKey && e.shiftKey && (e.key==='i' || e.key==='I' || e.key==='j' || e.key==='J')){ e.preventDefault(); acState.violations++; }
+  if(e.key==='F12'){ e.preventDefault(); acState.violations++; }
+}
+
+function autoSubmitWorkshop(){
+  alert('\u23f0 Time is up! Your answers are being submitted automatically.');
+  var submitBtn = document.getElementById('submitBtn');
+  if(submitBtn && !submitBtn.disabled){
+    submitBtn.click();
+  } else {
+    // Force submit even if not all MCQs answered
+    forceSubmitWorkshop();
+  }
+}
+
+async function forceSubmitWorkshop(){
+  var wdata = WCACHE[currentEmpId];
+  var w = WORKSHOPS.find(function(w){ return w.week === wkState.week; });
+  if(!w) return;
+  var rec = wdata[w.id];
+  var questions = MCQ_BANK[w.id];
+  var answers = questions.map(function(_,i){
+    var el = document.querySelector('input[name="mcq-'+i+'"]:checked');
+    return el ? Number(el.value) : null;
+  });
+  var score = answers.reduce(function(n,a,i){ return n + (a!==null && a===questions[i].correct?1:0); },0);
+  var openEnded = w.tasks.map(function(_,i){
+    var ta = document.querySelector('textarea[data-taski="'+i+'"]');
+    return ta ? ta.value : '';
+  });
+  rec.mcq = answers; rec.mcqScore = score; rec.openEnded = openEnded;
+  rec.submittedAt = new Date().toISOString();
+  rec._antiCheat = { tabSwitches:acState.tabSwitches, violations:acState.violations, timeUsed:1800-acState.seconds, startedAt:acState.startedAt, tabSwitchLog:acState.tabSwitchLog, completedAt:new Date().toISOString() };
+  await saveWorkshopData(currentEmpId);
+  stopAntiCheat();
+  renderMyWorkshops();
+}
+
+function renderWorkshopForm(container, w, rec){
+  const questions = MCQ_BANK[w.id];
+  
+  // Part 1: Instructions (always visible)
+  let html = `<div class="ac-instructions">
+      <h3>\u26a0\ufe0f Assessment Rules — Read Before You Start</h3>
+      <ul>
+        <li><b>\u23f0 30-Minute Timer:</b> You have exactly 30 minutes. Timer starts when you click "Start Assessment" below. Cannot be paused. Auto-submits when time runs out.</li>
+        <li><b>\ud83d\udeab No Tab Switching:</b> Switching tabs is detected and recorded. Each switch is logged and visible to L&D.</li>
+        <li><b>\ud83d\udcdd No Copying Questions:</b> Right-click and copy are disabled on questions.</li>
+        <li><b>\u2705 Answer All 20 MCQs:</b> All 20 must be answered + written tasks required.</li>
+        <li><b>\ud83d\udd12 Submission is Final:</b> No edit, no redo after submitting.</li>
+      </ul>
+      <div class="start-note">Read the scenario below first, then click "Start Assessment" when you are ready.</div>
+    </div>`;
+
+  // Part 2: Timer bar (starts paused)
+  html += `<div class="timer-bar">
+      <div><span class="time" id="acTimer" style="opacity:0.5;">30:00</span><div class="info" id="acTimerInfo">\u23f8\ufe0f Waiting — click "Start Assessment" to begin</div></div>
+      <div style="text-align:right;"><span class="violations" id="acViolations"></span><div class="info">\ud83d\udee1\ufe0f Proctored Assessment</div></div>
+    </div>`;
+  
+  // Part 3: Start Assessment overlay (between scenario and questions)
+  html += `<div id="startOverlay" class="start-overlay">
+      <h3>Ready to begin?</h3>
+      <p>You have read the scenario above. Once you click Start, the 30-minute timer begins and questions unlock.<br>You cannot pause the timer once started.</p>
+      <button class="start-btn" id="startAssessmentBtn">Start Assessment</button>
+    </div>`;
+
+  // Part 4: Questions + Tasks (LOCKED until Start is clicked)
+  html += `<div id="assessmentArea" class="assessment-locked">`;
+  html += `<h3>Comprehension Check — 20 questions</h3><p class="hint">Pick one answer for each. Timer: 30 minutes. Tab switches are recorded.</p>`;
+  questions.forEach((q,i)=>{
+    html += `<div class="mcq-block" data-qi="${i}">
+      <div class="mcq-q">${i+1}. ${q.q}</div>
+      ${q.options.map((opt,oi)=>`
+        <label class="mcq-opt"><input type="radio" name="mcq-${i}" value="${oi}" ${rec.mcq[i]===oi?'checked':''}> ${opt}</label>
+      `).join('')}
+    </div>`;
+  });
+  html += `<h3>Your Written Tasks</h3>`;
+  w.tasks.forEach((t,i)=>{
+    html += `<div class="task-block"><label>${i+1}. ${t}</label><textarea data-taski="${i}" placeholder="Type your answer…">${rec.openEnded[i]||''}</textarea></div>`;
+  });
+  html += `<div style="margin-top:10px;"><span id="progressNote" class="hint" style="display:inline-block;"></span></div>`;
+  html += `<button class="primary" id="submitBtn">Submit Week ${w.week}</button><span class="save-msg" id="saveMsg">Saved ✓</span>`;
+  container.innerHTML = html;
+
+  // START ASSESSMENT button handler
+  var startBtn = document.getElementById('startAssessmentBtn');
+  if(startBtn){
+    startBtn.addEventListener('click', function(){
+      document.getElementById('assessmentArea').classList.remove('assessment-locked');
+      document.getElementById('startOverlay').style.display = 'none';
+      startAntiCheat(w.id);
+      var timerEl = document.getElementById('acTimer');
+      if(timerEl) timerEl.style.opacity = '1';
+      var infoEl = document.getElementById('acTimerInfo');
+      if(infoEl) infoEl.textContent = 'Time remaining \u2014 auto-submits when time runs out';
+      var instrBox = container.querySelector('.ac-instructions');
+      if(instrBox){
+        var note = instrBox.querySelector('.start-note');
+        if(note) note.textContent = '\u23f0 Timer started! 30 minutes remaining.';
+        instrBox.style.borderColor = '#1E8A4C';
+      }
+    });
+  }
+
+  function countAnswered(){
+    return questions.reduce((n,_,i)=> n + (container.querySelector(`input[name="mcq-${i}"]:checked`) ? 1 : 0), 0);
+  }
+  function updateNote(){
+    const n = countAnswered();
+    document.getElementById('progressNote').textContent = n<20 ? `${n}/20 answered — all 20 are needed before you can submit.` : `All 20 answered — ready to submit.`;
+    document.getElementById('submitBtn').disabled = n<20;
+    document.getElementById('submitBtn').style.opacity = n<20 ? '.5' : '1';
+  }
+  container.querySelectorAll('input[type=radio]').forEach(inp=> inp.addEventListener('change', function(){
+      updateNote();
+      // Timer already started via Start Assessment button
+    }));
+  updateNote();
+
+  document.getElementById('submitBtn').addEventListener('click', async ()=>{
+    const answers = questions.map((_,i)=>{
+      const el = container.querySelector(`input[name="mcq-${i}"]:checked`);
+      return el ? Number(el.value) : null;
+    });
+    if(answers.some(a=>a==null)) return;
+    const score = answers.reduce((n,a,i)=> n + (a===questions[i].correct?1:0), 0);
+    const openEnded = w.tasks.map((_,i)=> container.querySelector(`textarea[data-taski="${i}"]`).value);
+    rec.mcq = answers; rec.mcqScore = score; rec.openEnded = openEnded; rec.submittedAt = new Date().toISOString();
+    rec._antiCheat = { tabSwitches:acState.tabSwitches, violations:acState.violations, timeUsed:1800-acState.seconds, startedAt:acState.startedAt, tabSwitchLog:acState.tabSwitchLog, completedAt:new Date().toISOString() };
+    stopAntiCheat();
+    await saveWorkshopData(currentEmpId);
+    renderMyWorkshops();
+  });
+}
+
+/* =========================================================
+   MY PROJECT
+   ========================================================= */
+let projState = { cycleId: (()=>{ for(const c of PROJECT_CYCLES){ if(cycleStatus(c.month)!=='past') return c.id; } return "BM-12"; })() };
+
+async function renderMyProject(){
+  await loadWorkshopData(currentEmpId);
+  await loadProjectData(currentEmpId);
+  if(!isProjectUnlocked(currentEmpId)){
+    document.getElementById('main').innerHTML = `<div class="card"><div class="lock-banner"><div class="lock-icon">🔒</div><h3>Project Phase is Locked</h3><p>Submit all 8 workshops to unlock the Project phase.</p><p style="margin-top:6px;">Progress: <b>${WORKSHOPS.filter(w=>WCACHE[currentEmpId][w.id].submittedAt).length}/8</b> workshops submitted.</p><p style="color:#B0C4FF; font-size:13px; margin-top:6px;">Each workshop requires its own session password from your facilitator before you can attempt it.</p><p style="margin-top:16px;"><button class="ghost" style="color:#FFC424;border-color:#FFC424;" onclick="activeTab='myworkshops';renderNav();renderMain();">Go to Workshops</button></p><p style="margin-top:10px;"><button class="ghost" style="color:#B0C4FF;border-color:#B0C4FF;font-size:12px;" onclick="(function(){var p=prompt('Admin password:');if(p==='ElevateAdmin@2026'){projectAdminUnlocked=true;renderNav();renderMain();}else if(p!==null){alert('Incorrect password.');}})();">Admin Access</button></p></div></div>`;
+    return;
+  }
+  const pdata = PCACHE[currentEmpId];
+  const c = PROJECT_CYCLES.find(c=>c.id===projState.cycleId);
+  const rec = pdata[c.id];
+  const status = cycleStatus(c.month);
+  const submitted = !!rec.submittedAt;
+  const doneIds = PROJECT_CYCLES.filter(cc=>pdata[cc.id].submittedAt).map(cc=>cc.id);
+
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="card">
+      <h2>My Project</h2>
+      <p class="hint">A take-home project case study every two months, from Month 3 (October 2026) through Month 24. Each is scored on Behavioural and Leadership by L&D — your job here is the written submission.</p>
+      <div class="row">
+        <div class="field"><label>Your name</label><select id="empSelect">${employeeOptions(currentEmpId)}</select></div>
+        <div class="field"><label>Cycle</label><select id="cycleSelect">
+          ${PROJECT_CYCLES.map(cc=>`<option value="${cc.id}" ${cc.id===c.id?'selected':''}>${cc.id} · Month ${cc.month} · ${cc.title}</option>`).join('')}
+        </select></div>
+      </div>
+      ${progressStrip(PROJECT_CYCLES, doneIds, c.id)}
+
+      <h3 style="margin-top:4px;">${c.id} · ${c.title} <span style="color:var(--gray); font-weight:400;">— Month ${c.month} (${monthLabel(c.month)})</span></h3>
+      <div style="margin-bottom:10px;">${statusChip(status)} <span style="color:var(--gray); font-size:12.5px; margin-left:8px;">Focus: ${c.focus}</span>
+      ${submitted?`<span class="status-chip done" style="margin-left:8px;">Submitted</span>`:''}</div>
+      <p class="hint" style="font-style:italic; color:var(--teal);">${c.quote}</p>
+
+      <h3>The Scenario</h3>
+      <p class="hint" style="color:#22262e;">${c.scenario}</p>
+      <h3>Your Data &amp; Context</h3>
+      <ul style="margin:0 0 10px; padding-left:20px; font-size:14px;">${c.data.map(d=>`<li style="margin-bottom:4px;">${d}</li>`).join('')}</ul>
+      <h3>Deliverable</h3>
+      <p class="hint" style="color:#22262e;">${c.deliverable}</p>
+
+      ${submitted ? `
+        <div class="score-banner">
+          Submitted ${new Date(rec.submittedAt).toLocaleString()} — awaiting L&D scoring on the Behavioural &amp; Leadership rubrics.
+        </div>
+      ` : ''}
+      <div id="formArea"></div>
+    </div>
+  `;
+
+  document.getElementById('empSelect').addEventListener('change', e=>{ currentEmpId=Number(e.target.value); renderMyProject(); });
+  document.getElementById('cycleSelect').addEventListener('change', e=>{ projState.cycleId=e.target.value; renderMyProject(); });
+
+  const formArea = document.getElementById('formArea');
+  if(submitted){
+    formArea.innerHTML = `<div class="score-banner">Submitted ${new Date(rec.submittedAt).toLocaleString()} \u2014 awaiting L&D scoring.<br><span style="font-size:12px;color:var(--gray);">Submission is final and cannot be edited.</span><br><button onclick="adminClearProject('${c.id}')" style="background:transparent;color:var(--red);border:1px solid var(--red);padding:5px 12px;border-radius:16px;font-weight:600;cursor:pointer;margin-top:8px;font-size:11px;">🔒 Admin: Clear ${c.id}</button></div><h3>Your submission</h3>` + c.tasks.map((t,i)=>`
+      <div class="task-block"><label>${i+1}. ${t}</label><div class="hint" style="background:var(--lightgray); padding:10px; border-radius:6px;">${rec.openEnded[i] || '<em>No answer given</em>'}</div></div>
+    `).join('');
+    return;
+  }
+
+  let html = `<h3>Your Written Tasks</h3>`;
+  c.tasks.forEach((t,i)=>{
+    html += `<div class="task-block"><label>${i+1}. ${t}</label><textarea data-taski="${i}" placeholder="Type your answer…">${rec.openEnded[i]||''}</textarea></div>`;
+  });
+  html += `<button class="primary" id="submitBtn">Submit ${c.id}</button><span class="save-msg" id="saveMsg">Saved ✓</span>`;
+  formArea.innerHTML = html;
+
+  document.getElementById('submitBtn').addEventListener('click', async ()=>{
+    const openEnded = c.tasks.map((_,i)=> formArea.querySelector(`textarea[data-taski="${i}"]`).value);
+    rec.openEnded = openEnded; rec.submittedAt = new Date().toISOString();
+    await saveProjectData(currentEmpId);
+    renderMyProject();
+  });
+}
+
+/* =========================================================
+   L&D REVIEW
+   ========================================================= */
+/* =========================================================
+   BOOTSTRAP
+   ========================================================= */
+renderNav();
+renderMain();
+</script>
+</body>
+</html>
